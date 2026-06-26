@@ -4,6 +4,7 @@ obj/
 riderModule.iml
 /_ReSharper.Caches/
 *.log
+.idea/
 logs/
 *.DotSettings.user
 .claude/
