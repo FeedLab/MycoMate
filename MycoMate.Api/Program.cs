@@ -7,7 +7,7 @@ using MycoMate.Api.Extensions;
 using Serilog;
 
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.Console()
+    .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
     .CreateBootstrapLogger();
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,6 +55,8 @@ builder.Services.AddOpenApi(options =>
 var connectionString = Environment.GetEnvironmentVariable("DefaultConnection")
                        ?? builder.Configuration.GetConnectionString("DefaultConnection")
                        ?? throw new InvalidOperationException("No connection string found.");
+
+Log.Information("Using connection string: {ConnectionString}", connectionString);
 
 builder.Services.AddDbContext<MycoMateDbContext>(options =>
     options.UseSqlServer(connectionString));
