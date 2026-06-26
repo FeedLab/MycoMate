@@ -10,6 +10,10 @@ namespace MycoMate.Api.Extensions;
 
 public static class ServiceExtensions
 {
+    public static string GetJwtKey(IConfiguration config) =>
+        config["Jwt:Key"] ?? Environment.GetEnvironmentVariable("JWT_KEY")
+        ?? throw new InvalidOperationException("JWT key is not configured. Set 'Jwt:Key' in appsettings or the 'JWT_KEY' environment variable.");
+
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration config)
     {
         services.AddIdentityCore<IdentityUser>()
@@ -28,7 +32,7 @@ public static class ServiceExtensions
                     ValidIssuer = config["Jwt:Issuer"],
                     ValidAudience = config["Jwt:Audience"],
                     IssuerSigningKey = new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(config["Jwt:Key"]!))
+                        Encoding.UTF8.GetBytes(GetJwtKey(config)))
                 };
             });
 
