@@ -11,6 +11,14 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Debug secrets
+        run: |
+          if ("${{ secrets.WEBSITE_NAME }}" -eq "") { echo "WEBSITE_NAME: NOT SET" } else { echo "WEBSITE_NAME: set ($("${{ secrets.WEBSITE_NAME }}".Length) chars)" }
+          if ("${{ secrets.SERVER_COMPUTER_NAME }}" -eq "") { echo "SERVER_COMPUTER_NAME: NOT SET" } else { echo "SERVER_COMPUTER_NAME: set ($("${{ secrets.SERVER_COMPUTER_NAME }}".Length) chars)" }
+          if ("${{ secrets.SERVER_USERNAME }}" -eq "") { echo "SERVER_USERNAME: NOT SET" } else { echo "SERVER_USERNAME: set ($("${{ secrets.SERVER_USERNAME }}".Length) chars)" }
+          if ("${{ secrets.SERVER_PASSWORD }}" -eq "") { echo "SERVER_PASSWORD: NOT SET" } else { echo "SERVER_PASSWORD: set ($("${{ secrets.SERVER_PASSWORD }}".Length) chars)" }
+        shell: pwsh
+
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
