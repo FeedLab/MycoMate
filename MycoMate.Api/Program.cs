@@ -21,12 +21,16 @@ builder.Services.AddOpenApi(options =>
     {
         document.Components ??= new OpenApiComponents();
         document.Components.SecuritySchemes ??= new Dictionary<string, IOpenApiSecurityScheme>();
-        document.Components.SecuritySchemes["Bearer"] = new OpenApiSecurityScheme
+        document.Components.SecuritySchemes["OAuth2"] = new OpenApiSecurityScheme
         {
-            Type = SecuritySchemeType.Http,
-            Scheme = "bearer",
-            BearerFormat = "JWT",
-            Description = "Paste the JWT token from /login"
+            Type = SecuritySchemeType.OAuth2,
+            Flows = new OpenApiOAuthFlows
+            {
+                Password = new OpenApiOAuthFlow
+                {
+                    TokenUrl = new Uri("/connect/token", UriKind.Relative)
+                }
+            }
         };
         return Task.CompletedTask;
     });
@@ -72,10 +76,12 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference(options =>
     {
         options.WithDefaultHttpClient(ScalarTarget.Http, ScalarClient.HttpClient);
-        options.Authentication = new ScalarAuthenticationOptions
+        options.AddPreferredSecuritySchemes(["OAuth2"]);
+        options.AddPasswordFlow("OAuth2", flow =>
         {
-            PreferredSecuritySchemes = ["Bearer"]
-        };
+            flow.Username = "user@example.com";
+            flow.Password = "Pass123$";
+        });
     });
 }
 
