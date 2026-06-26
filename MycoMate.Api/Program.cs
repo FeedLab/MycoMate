@@ -5,6 +5,9 @@ using Scalar.AspNetCore;
 using MycoMate.Api.Data;
 using MycoMate.Api.Extensions;
 using Serilog;
+using Serilog.Debugging;
+
+SelfLog.Enable(Console.Error);
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console(outputTemplate: "[{Timestamp:yyyy-MM-dd HH:mm:ss} {Level:u3}] {Message:lj}{NewLine}{Exception}")
