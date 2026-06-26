@@ -28,11 +28,13 @@ jobs:
         run: dotnet publish MycoMate.Api/MycoMate.Api.csproj -c Release -o publish
 
       - name: Deploy via WebDeploy
-        run: |
-          & "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe" `
-            -verb:sync `
-            -source:contentPath="$(Resolve-Path publish)" `
-            -dest:contentPath="${{ secrets.WEBSITE_NAME }}",computerName="https://${{ secrets.SERVER_COMPUTER_NAME }}:8172/msdeploy.axd?site=${{ secrets.WEBSITE_NAME }}",userName="${{ secrets.SERVER_USERNAME }}",password="${{ secrets.SERVER_PASSWORD }}",authType="Basic" `
-            -allowUntrusted `
-            -enableRule:AppOffline
         shell: pwsh
+        run: |
+          $msdeploy = "C:\Program Files\IIS\Microsoft Web Deploy V3\msdeploy.exe"
+          $src = (Resolve-Path publish).Path
+          $server = "${{ secrets.SERVER_COMPUTER_NAME }}"
+          $site = "${{ secrets.WEBSITE_NAME }}"
+          $user = "${{ secrets.SERVER_USERNAME }}"
+          $pass = "${{ secrets.SERVER_PASSWORD }}"
+          $dest = "contentPath=$site,computerName=https://${server}:8172/msdeploy.axd?site=$site,userName=$user,password=$pass,authType=Basic"
+          & $msdeploy "-verb:sync" "-source:contentPath=$src" "-dest:$dest" "-allowUntrusted" "-enableRule:AppOffline"
