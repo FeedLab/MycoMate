@@ -46,37 +46,47 @@ public static class ProjectEndpoints
         })
         .WithName("CreateProject");
 
-        group.MapPost("/{id:guid}/members", async (Guid id, AddMemberRequest req, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
+        group.MapPost("/{projectId:guid}/members", async (Guid projectId, AddMemberRequest req, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await repo.GetUserRoleAsync(id, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Owner) return Results.Forbid();
+            var role = await repo.GetUserRoleAsync(projectId, userId, ct);
+            
+            if (role is null) 
+                return Results.NotFound();
+            
+            if (role == ProjectRole.ReadOnly)
+                return Results.Forbid();
 
-            await repo.AddMemberAsync(id, req.UserId, req.Role, ct);
+            await repo.AddMemberAsync(projectId, req.UserId, req.Role, ct);
+            
             return Results.NoContent();
         })
         .WithName("AddProjectMember");
 
-        group.MapDelete("/{id:guid}/members/{memberId}", async (Guid id, string memberId, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
+        group.MapDelete("/{projectId:guid}/members/{memberId}", async (Guid projectId, string memberId, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await repo.GetUserRoleAsync(id, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Owner) return Results.Forbid();
+            var role = await repo.GetUserRoleAsync(projectId, userId, ct);
+            
+            if (role is null)
+                return Results.NotFound();
+            
+            if (role < ProjectRole.Owner)
+                return Results.Forbid();
 
-            var removed = await repo.RemoveMemberAsync(id, memberId, ct);
+            var removed = await repo.RemoveMemberAsync(projectId, memberId, ct);
+            
             return removed ? Results.NoContent() : Results.NotFound();
         })
         .WithName("RemoveProjectMember");
 
-        group.MapDelete("/{id:guid}", async (Guid id, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
+        group.MapDelete("/{projectId:guid}", async (Guid projectId, ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>
         {
             var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await repo.GetUserRoleAsync(id, userId, ct);
-            if (role is null || role < ProjectRole.Owner) return Results.Forbid();
+            var role = await repo.GetUserRoleAsync(projectId, userId, ct);
+            if (role is null or < ProjectRole.Owner) return Results.Forbid();
 
-            var deleted = await repo.DeleteAsync(id, userId, ct);
+            var deleted = await repo.DeleteAsync(projectId, userId, ct);
             return deleted ? Results.NoContent() : Results.NotFound();
         })
         .WithName("DeleteProject");
