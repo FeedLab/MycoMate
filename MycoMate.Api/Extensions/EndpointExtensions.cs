@@ -9,6 +9,7 @@ public static class EndpointExtensions
         app.MapAuthEndpoints();
         app.MapIngredientEndpoints();
         app.MapProjectEndpoints();
+        app.MapSubstrateRecipeEndpoints();
 
         return app;
     }

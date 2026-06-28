@@ -4,5 +4,6 @@ namespace MycoMate.Api.Repositories;
 
 public interface IIngredientRepository
 {
-    Task<Ingredient> AddAsync(Ingredient ingredient, string userId, CancellationToken ct = default);
+    Task<IEnumerable<Ingredient>> GetVisibleAsync(string ownerUserId, CancellationToken ct = default);
+    Task<Ingredient> AddAsync(Ingredient ingredient, CancellationToken ct = default);
 }

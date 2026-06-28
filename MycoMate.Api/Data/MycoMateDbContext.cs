@@ -10,6 +10,8 @@ public class MycoMateDbContext(DbContextOptions<MycoMateDbContext> options) : Id
     public DbSet<Ingredient> Ingredients => Set<Ingredient>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectMember> ProjectMembers => Set<ProjectMember>();
+    public DbSet<SubstrateRecipe> SubstrateRecipes => Set<SubstrateRecipe>();
+    public DbSet<RecipeIngredient> RecipeIngredients => Set<RecipeIngredient>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {

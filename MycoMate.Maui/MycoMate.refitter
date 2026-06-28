@@ -1,0 +1,5 @@
+{
+  "openApiPath": "./openapi/v1.json",
+  "namespace": "MycoMate.Maui.Api",
+  "interfaceName": "IMycoMateClient"
+}

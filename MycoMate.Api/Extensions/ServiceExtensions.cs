@@ -41,6 +41,7 @@ public static class ServiceExtensions
 
         services.AddScoped<IIngredientRepository, IngredientRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
+        services.AddScoped<ISubstrateRecipeRepository, SubstrateRecipeRepository>();
         services.AddScoped<TokenService>();
 
         return services;
