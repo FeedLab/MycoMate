@@ -38,7 +38,11 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
+#if ANDROID
+        builder.Services.AddMycoMateApiClient("https://10.0.2.2:7010"); // Android emulator → host machine
+#else
         builder.Services.AddMycoMateApiClient("https://localhost:7010");
+#endif
 
 #if DEBUG
         builder.Logging.AddDebug();

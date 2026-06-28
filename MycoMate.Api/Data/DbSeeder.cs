@@ -79,9 +79,9 @@ public static class DbSeeder
             FinalMixtureSizeKg    = 10m,
             ProjectId             = project.Id
         };
-        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = ws.Id,  Amount = 80m });
-        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = wb.Id,  Amount = 15m });
-        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = oat.Id, Amount = 5m  });
+        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = ws.Id,  WetAmount = 80m, WetAmountPercent = 80m, MoistureContent = ws.MoistureContent  });
+        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = wb.Id,  WetAmount = 15m, WetAmountPercent = 15m, MoistureContent = wb.MoistureContent  });
+        recipe.Ingredients.Add(new RecipeIngredient { IngredientId = oat.Id, WetAmount = 5m,  WetAmountPercent = 5m,  MoistureContent = oat.MoistureContent });
         db.SubstrateRecipes.Add(recipe);
 
         await db.SaveChangesAsync();

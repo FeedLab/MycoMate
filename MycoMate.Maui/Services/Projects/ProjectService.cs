@@ -5,11 +5,11 @@ namespace MycoMate.Maui.Services.Projects;
 
 public class ProjectService(IMycoMateApiv1 api)
 {
-    public async Task GetAllAsync()
+    public async Task<ICollection<ProjectResponse>> GetAllAsync()
     {
         try
         {
-            await api.GetProjects();
+            return await api.GetProjects();
         }
         catch (ApiException ex)
         {

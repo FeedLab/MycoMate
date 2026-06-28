@@ -24,11 +24,18 @@ namespace MycoMate.Maui.Api
         Task Register([Body] RegisterRequest body);
 
         /// <param name="body">body parameter</param>
-        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
-        [Headers("Content-Type: application/json")]
+        [Headers("Accept: application/json", "Content-Type: application/json")]
         [Post("/login")]
-        Task Login([Body] LoginRequest body);
+        Task<TokenResponse> Login([Body] LoginRequest body);
+
+        /// <param name="body">body parameter</param>
+        /// <returns>OK</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Accept: application/json", "Content-Type: application/json")]
+        [Post("/refresh")]
+        Task<TokenResponse> Refresh([Body] RefreshRequest body);
 
         /// <returns>OK</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
@@ -36,17 +43,25 @@ namespace MycoMate.Maui.Api
         [Get("/weatherforecast")]
         Task<ICollection<WeatherForecast>> GetWeatherForecast();
 
+        /// <param name="projectId">projectId parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Get("/projects/{projectId}/ingredients")]
+        Task GetIngredients(System.Guid projectId);
+
+        /// <param name="projectId">projectId parameter</param>
         /// <param name="body">body parameter</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Headers("Content-Type: application/json")]
-        [Post("/ingredients")]
-        Task CreateIngredient([Body] CreateIngredientRequest body);
+        [Post("/projects/{projectId}/ingredients")]
+        Task CreateIngredient(System.Guid projectId, [Body] CreateIngredientRequest body);
 
-        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Accept: application/json")]
         [Get("/projects")]
-        Task GetProjects();
+        Task<ICollection<ProjectResponse>> GetProjects();
 
         /// <param name="body">body parameter</param>
         /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
@@ -81,6 +96,61 @@ namespace MycoMate.Maui.Api
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
         [Delete("/projects/{projectId}")]
         Task DeleteProject(System.Guid projectId);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Get("/projects/{projectId}/recipes")]
+        Task GetSubstrateRecipes(System.Guid projectId);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="body">body parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
+        [Post("/projects/{projectId}/recipes")]
+        Task CreateSubstrateRecipe(System.Guid projectId, [Body] CreateSubstrateRecipeRequest body);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="id">id parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Get("/projects/{projectId}/recipes/{id}")]
+        Task GetSubstrateRecipe(System.Guid projectId, System.Guid id);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="id">id parameter</param>
+        /// <param name="body">body parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
+        [Put("/projects/{projectId}/recipes/{id}")]
+        Task UpdateSubstrateRecipe(System.Guid projectId, System.Guid id, [Body] UpdateSubstrateRecipeRequest body);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="id">id parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Delete("/projects/{projectId}/recipes/{id}")]
+        Task DeleteSubstrateRecipe(System.Guid projectId, System.Guid id);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="id">id parameter</param>
+        /// <param name="ingredientId">ingredientId parameter</param>
+        /// <param name="body">body parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Content-Type: application/json")]
+        [Put("/projects/{projectId}/recipes/{id}/ingredients/{ingredientId}")]
+        Task SetRecipeIngredient(System.Guid projectId, System.Guid id, System.Guid ingredientId, [Body] RecipeIngredientRequest body);
+
+        /// <param name="projectId">projectId parameter</param>
+        /// <param name="id">id parameter</param>
+        /// <param name="ingredientId">ingredientId parameter</param>
+        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Delete("/projects/{projectId}/recipes/{id}/ingredients/{ingredientId}")]
+        Task RemoveRecipeIngredient(System.Guid projectId, System.Guid id, System.Guid ingredientId);
 
 
     }
@@ -188,6 +258,38 @@ namespace MycoMate.Maui.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class CreateSubstrateRecipeRequest
+    {
+
+        [JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("moistureContentTarget")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
+        public double MoistureContentTarget { get; set; }
+
+        [JsonPropertyName("finalMixtureSizeKg")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
+        public double FinalMixtureSizeKg { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class LoginRequest
     {
 
@@ -211,6 +313,103 @@ namespace MycoMate.Maui.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class ProjectResponse
+    {
+
+        [JsonPropertyName("id")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid Id { get; set; }
+
+        [JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [JsonPropertyName("created")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.DateTimeOffset Created { get; set; }
+
+        [JsonPropertyName("ownerId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string OwnerId { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RecipeIngredientRequest
+    {
+
+        [JsonPropertyName("ingredientId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid IngredientId { get; set; }
+
+        [JsonPropertyName("wetAmount")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
+        public double WetAmount { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class TokenResponse
+    {
+
+        [JsonPropertyName("accessToken")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string AccessToken { get; set; }
+
+        [JsonPropertyName("refreshToken")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string RefreshToken { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RefreshRequest
+    {
+
+        [JsonPropertyName("refreshToken")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string RefreshToken { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class RegisterRequest
     {
 
@@ -221,6 +420,38 @@ namespace MycoMate.Maui.Api
         [JsonPropertyName("password")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Password { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class UpdateSubstrateRecipeRequest
+    {
+
+        [JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("moistureContentTarget")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
+        public double MoistureContentTarget { get; set; }
+
+        [JsonPropertyName("finalMixtureSizeKg")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
+        public double FinalMixtureSizeKg { get; set; }
 
         private IDictionary<string, object> _additionalProperties;
 

@@ -24,7 +24,9 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
     public async Task<SubstrateRecipe> AddAsync(SubstrateRecipe recipe, CancellationToken ct = default)
     {
         db.SubstrateRecipes.Add(recipe);
+
         await db.SaveChangesAsync(ct);
+
         return recipe;
     }
 
@@ -53,21 +55,42 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
     public async Task<bool> AddOrUpdateIngredientAsync(Guid recipeId, Guid ingredientId, decimal amount, CancellationToken ct = default)
     {
         var recipeExists = await db.SubstrateRecipes.AnyAsync(r => r.Id == recipeId, ct);
-        if (!recipeExists) return false;
+
+        if (!recipeExists)
+        {
+            return false;
+        }
+
+        var ingredient = await db.Ingredients.FindAsync([ingredientId], ct);
+
+        if (ingredient is null)
+        {
+            return false;
+        }
 
         var existing = await db.RecipeIngredients
             .FirstOrDefaultAsync(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId, ct);
 
         if (existing is not null)
         {
-            existing.Amount = amount;
+            existing.WetAmount = amount;
+            existing.MoistureContent = ingredient.MoistureContent;
         }
         else
         {
-            db.RecipeIngredients.Add(new RecipeIngredient { RecipeId = recipeId, IngredientId = ingredientId, Amount = amount });
+            db.RecipeIngredients.Add(new RecipeIngredient
+            {
+                RecipeId        = recipeId,
+                IngredientId    = ingredientId,
+                WetAmount       = amount,
+                MoistureContent = ingredient.MoistureContent
+            });
         }
 
         await db.SaveChangesAsync(ct);
+
+        await RecalculateWetAmountPercentsAsync(recipeId, ct);
+
         return true;
     }
 
@@ -77,6 +100,32 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
             .Where(ri => ri.RecipeId == recipeId && ri.IngredientId == ingredientId)
             .ExecuteDeleteAsync(ct);
 
+        if (rows > 0)
+        {
+            await RecalculateWetAmountPercentsAsync(recipeId, ct);
+        }
+
         return rows > 0;
+    }
+
+    private async Task RecalculateWetAmountPercentsAsync(Guid recipeId, CancellationToken ct)
+    {
+        var all = await db.RecipeIngredients
+            .Where(ri => ri.RecipeId == recipeId)
+            .ToListAsync(ct);
+
+        var total = all.Sum(ri => ri.WetAmount);
+
+        if (total == 0)
+        {
+            return;
+        }
+
+        foreach (var ri in all)
+        {
+            ri.WetAmountPercent = Math.Round(ri.WetAmount / total * 100m, 4);
+        }
+
+        await db.SaveChangesAsync(ct);
     }
 }

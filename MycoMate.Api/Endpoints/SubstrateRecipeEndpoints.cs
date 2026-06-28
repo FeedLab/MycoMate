@@ -14,89 +14,204 @@ public static class SubstrateRecipeEndpoints
             .WithTags("SubstrateRecipes")
             .RequireAuthorization();
 
-        group.MapGet("/", async (Guid projectId, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            if (await projectRepo.GetUserRoleAsync(projectId, userId, ct) is null) return Results.NotFound();
+        group.MapGet("/", async (Guid projectId, ClaimsPrincipal user, IProjectRepository projectRepo,
+                ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
 
-            var recipes = await recipeRepo.GetAllAsync(projectId, ct);
-            var response = recipes.Select(ToResponse);
-            return Results.Ok(response);
-        })
-        .WithName("GetSubstrateRecipes");
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
 
-        group.MapGet("/{id:guid}", async (Guid projectId, Guid id, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            if (await projectRepo.GetUserRoleAsync(projectId, userId, ct) is null) return Results.NotFound();
+                var recipes = await recipeRepo.GetAllAsync(projectId, ct);
+                var response = recipes.Select(ToResponse);
 
-            var recipe = await recipeRepo.GetByIdAsync(projectId, id, ct);
-            return recipe is null ? Results.NotFound() : Results.Ok(ToResponse(recipe));
-        })
-        .WithName("GetSubstrateRecipe");
+                return Results.Ok(response);
+            })
+            .WithName("GetSubstrateRecipes");
 
-        group.MapPost("/", async (Guid projectId, CreateSubstrateRecipeRequest req, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Editor) return Results.Forbid();
+        group.MapGet("/{id:guid}", async (Guid projectId, Guid id, ClaimsPrincipal user,
+                IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
 
-            var recipe = new SubstrateRecipe { Name = req.Name, Description = req.Description, MoistureContentTarget = req.MoistureContentTarget, FinalMixtureSizeKg = req.FinalMixtureSizeKg, ProjectId = projectId };
-            await recipeRepo.AddAsync(recipe, ct);
-            return Results.Created($"/projects/{projectId}/recipes/{recipe.Id}", ToResponse(recipe));
-        })
-        .WithName("CreateSubstrateRecipe");
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
 
-        group.MapPut("/{id:guid}", async (Guid projectId, Guid id, UpdateSubstrateRecipeRequest req, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Editor) return Results.Forbid();
+                var recipe = await recipeRepo.GetByIdAsync(projectId, id, ct);
 
-            var recipe = new SubstrateRecipe { Id = id, Name = req.Name, Description = req.Description, MoistureContentTarget = req.MoistureContentTarget, FinalMixtureSizeKg = req.FinalMixtureSizeKg, ProjectId = projectId };
-            var updated = await recipeRepo.UpdateAsync(recipe, ct);
-            return updated ? Results.NoContent() : Results.NotFound();
-        })
-        .WithName("UpdateSubstrateRecipe");
+                if (recipe is null)
+                {
+                    return Results.NotFound();
+                }
 
-        group.MapDelete("/{id:guid}", async (Guid projectId, Guid id, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Editor) return Results.Forbid();
+                return Results.Ok(ToResponse(recipe));
+            })
+            .WithName("GetSubstrateRecipe");
 
-            var deleted = await recipeRepo.DeleteAsync(projectId, id, ct);
-            return deleted ? Results.NoContent() : Results.NotFound();
-        })
-        .WithName("DeleteSubstrateRecipe");
+        group.MapPost("/", async (Guid projectId, CreateSubstrateRecipeRequest req, ClaimsPrincipal user,
+                IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
+
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
+
+                if (role < ProjectRole.Editor)
+                {
+                    return Results.Forbid();
+                }
+
+                var recipe = new SubstrateRecipe
+                {
+                    Name                  = req.Name,
+                    Description           = req.Description,
+                    MoistureContentTarget = req.MoistureContentTarget,
+                    FinalMixtureSizeKg    = req.FinalMixtureSizeKg,
+                    ProjectId             = projectId
+                };
+
+                await recipeRepo.AddAsync(recipe, ct);
+
+                return Results.Created($"/projects/{projectId}/recipes/{recipe.Id}", ToResponse(recipe));
+            })
+            .WithName("CreateSubstrateRecipe");
+
+        group.MapPut("/{id:guid}", async (Guid projectId, Guid id, UpdateSubstrateRecipeRequest req,
+                ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo,
+                CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
+
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
+
+                if (role < ProjectRole.Editor)
+                {
+                    return Results.Forbid();
+                }
+
+                var recipe = new SubstrateRecipe
+                {
+                    Id                    = id,
+                    Name                  = req.Name,
+                    Description           = req.Description,
+                    MoistureContentTarget = req.MoistureContentTarget,
+                    FinalMixtureSizeKg    = req.FinalMixtureSizeKg,
+                    ProjectId             = projectId
+                };
+
+                var updated = await recipeRepo.UpdateAsync(recipe, ct);
+
+                if (!updated)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.NoContent();
+            })
+            .WithName("UpdateSubstrateRecipe");
+
+        group.MapDelete("/{id:guid}", async (Guid projectId, Guid id, ClaimsPrincipal user,
+                IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
+
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
+
+                if (role < ProjectRole.Editor)
+                {
+                    return Results.Forbid();
+                }
+
+                var deleted = await recipeRepo.DeleteAsync(projectId, id, ct);
+
+                if (!deleted)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.NoContent();
+            })
+            .WithName("DeleteSubstrateRecipe");
 
         // Ingredient management
-        group.MapPut("/{id:guid}/ingredients/{ingredientId:guid}", async (Guid projectId, Guid id, Guid ingredientId, RecipeIngredientRequest req, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Editor) return Results.Forbid();
+        group.MapPut("/{id:guid}/ingredients/{ingredientId:guid}", async (Guid projectId, Guid id, Guid ingredientId,
+                RecipeIngredientRequest req, ClaimsPrincipal user, IProjectRepository projectRepo,
+                ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
 
-            var ok = await recipeRepo.AddOrUpdateIngredientAsync(id, ingredientId, req.Amount, ct);
-            return ok ? Results.NoContent() : Results.NotFound();
-        })
-        .WithName("SetRecipeIngredient");
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
 
-        group.MapDelete("/{id:guid}/ingredients/{ingredientId:guid}", async (Guid projectId, Guid id, Guid ingredientId, ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
-        {
-            var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
-            if (role is null) return Results.NotFound();
-            if (role < ProjectRole.Editor) return Results.Forbid();
+                if (role < ProjectRole.Editor)
+                {
+                    return Results.Forbid();
+                }
 
-            var removed = await recipeRepo.RemoveIngredientAsync(id, ingredientId, ct);
-            return removed ? Results.NoContent() : Results.NotFound();
-        })
-        .WithName("RemoveRecipeIngredient");
+                var ok = await recipeRepo.AddOrUpdateIngredientAsync(id, ingredientId, req.WetAmount, ct);
+
+                if (!ok)
+                {
+                    return Results.NotFound();
+                }
+
+                var recipe = await recipeRepo.GetByIdAsync(projectId, id, ct);
+
+                var ingredients = recipe!.Ingredients.Select(ri => new RecipeIngredientResponse(
+                    ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
+                    ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent));
+
+                return Results.Ok(ingredients);
+            })
+            .WithName("SetRecipeIngredient");
+
+        group.MapDelete("/{id:guid}/ingredients/{ingredientId:guid}", async (Guid projectId, Guid id,
+                Guid ingredientId, ClaimsPrincipal user, IProjectRepository projectRepo,
+                ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
+            {
+                var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
+                var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
+
+                if (role is null)
+                {
+                    return Results.NotFound();
+                }
+
+                if (role < ProjectRole.Editor)
+                {
+                    return Results.Forbid();
+                }
+
+                var removed = await recipeRepo.RemoveIngredientAsync(id, ingredientId, ct);
+
+                if (!removed)
+                {
+                    return Results.NotFound();
+                }
+
+                return Results.NoContent();
+            })
+            .WithName("RemoveRecipeIngredient");
 
         return app;
     }
@@ -104,5 +219,6 @@ public static class SubstrateRecipeEndpoints
     private static SubstrateRecipeResponse ToResponse(SubstrateRecipe r) =>
         new(r.Id, r.Name, r.Description, r.MoistureContentTarget, r.FinalMixtureSizeKg, r.Created, r.ProjectId,
             r.Ingredients.Select(ri => new RecipeIngredientResponse(
-                ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "", ri.Ingredient?.MoistureContent ?? 0, ri.Amount)));
+                ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
+                ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent)));
 }

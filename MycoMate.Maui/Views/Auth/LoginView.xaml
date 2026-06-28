@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="MycoMate.Maui.Views.Auth.LoginView">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,32" Spacing="0">
+
+            <!-- Logo -->
+            <Image Source="appicon.png"
+                   HeightRequest="64"
+                   WidthRequest="64"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,16" />
+
+            <!-- Title -->
+            <Label Text="Login to your account"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,24" />
+
+            <!-- Email -->
+            <core:SfTextInputLayout Hint="Email Address"
+                                    ContainerType="Outlined"
+                                    Margin="0,0,0,8">
+                <Entry x:Name="EmailEntry"
+                       Keyboard="Email" />
+            </core:SfTextInputLayout>
+
+            <!-- Forgot Password link -->
+            <Label Text="Forgot Password?"
+                   FontSize="13"
+                   TextColor="#2196F3"
+                   HorizontalOptions="End"
+                   Margin="0,0,0,8">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnForgotPasswordTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- Password -->
+            <core:SfTextInputLayout Hint="Password"
+                                    ContainerType="Outlined"
+                                    EnablePasswordVisibilityToggle="True"
+                                    Margin="0,0,0,32">
+                <Entry x:Name="PasswordEntry"
+                       IsPassword="True" />
+            </core:SfTextInputLayout>
+
+            <!-- Login button -->
+            <buttons:SfButton Text="Log in"
+                              Background="#2196F3"
+                              TextColor="White"
+                              FontAttributes="Bold"
+                              FontSize="16"
+                              CornerRadius="8"
+                              HeightRequest="52"
+                              Clicked="OnLoginClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentView>

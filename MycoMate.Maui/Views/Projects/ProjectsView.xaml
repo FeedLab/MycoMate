@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:listView="clr-namespace:Syncfusion.Maui.ListView;assembly=Syncfusion.Maui.ListView"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:vm="clr-namespace:MycoMate.Maui.ViewModels"
+             xmlns:models="clr-namespace:MycoMate.Maui.Models"
+             x:Class="MycoMate.Maui.Views.Projects.ProjectsView"
+             x:DataType="vm:ProjectsViewModel">
+
+    <Grid>
+        <!-- List -->
+        <listView:SfListView x:Name="ProjectList"
+                             ItemsSource="{Binding Projects}"
+                             SelectionMode="None"
+                             ItemSize="72">
+
+            <listView:SfListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Project">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Execute">
+                                <SwipeItem Text="Delete"
+                                           BackgroundColor="#F44336"
+                                           Invoked="OnDeleteSwiped" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
+                        <Grid Padding="16,0"
+                              ColumnDefinitions="*,Auto"
+                              BackgroundColor="White">
+                            <Label Text="{Binding Name}"
+                                   FontSize="16"
+                                   VerticalOptions="Center" />
+                            <buttons:SfButton Grid.Column="1"
+                                             Text="&#x270E;"
+                                             BackgroundColor="Transparent"
+                                             TextColor="#2196F3"
+                                             FontSize="20"
+                                             WidthRequest="44"
+                                             VerticalOptions="Center"
+                                             CommandParameter="{Binding .}"
+                                             Clicked="OnEditClicked" />
+                        </Grid>
+                    </SwipeView>
+                </DataTemplate>
+            </listView:SfListView.ItemTemplate>
+
+        </listView:SfListView>
+
+        <!-- Empty state -->
+        <VerticalStackLayout x:Name="EmptyState" IsVisible="False"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+            <Label Text="No projects yet"
+                   FontSize="18"
+                   TextColor="#9E9E9E"
+                   HorizontalOptions="Center" />
+            <Label Text="Tap + to create your first project"
+                   FontSize="14"
+                   TextColor="#BDBDBD"
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
+        <!-- Loading overlay -->
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#2196F3"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+
+        <!-- FAB Add button -->
+        <buttons:SfButton Text="+"
+                          BackgroundColor="#2196F3"
+                          TextColor="White"
+                          FontSize="28"
+                          CornerRadius="28"
+                          HeightRequest="56"
+                          WidthRequest="56"
+                          HorizontalOptions="End"
+                          VerticalOptions="End"
+                          Margin="0,0,24,24"
+                          Clicked="OnAddClicked" />
+
+        <!-- Add/Edit dialog -->
+        <Grid x:Name="DialogOverlay"
+              IsVisible="False"
+              BackgroundColor="#80000000">
+            <Border StrokeShape="RoundRectangle 16"
+                    BackgroundColor="White"
+                    Padding="24"
+                    WidthRequest="320"
+                    HorizontalOptions="Center"
+                    VerticalOptions="Center">
+                <VerticalStackLayout Spacing="16">
+                    <Label x:Name="DialogTitle"
+                           Text="New Project"
+                           FontSize="18"
+                           FontAttributes="Bold" />
+                    <core:SfTextInputLayout Hint="Project name"
+                                            ContainerType="Outlined">
+                        <Entry x:Name="ProjectNameEntry" />
+                    </core:SfTextInputLayout>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <buttons:SfButton Grid.Column="0"
+                                          Text="Cancel"
+                                          BackgroundColor="#E0E0E0"
+                                          TextColor="#424242"
+                                          CornerRadius="8"
+                                          Clicked="OnDialogCancelClicked" />
+                        <buttons:SfButton Grid.Column="1"
+                                          Text="Save"
+                                          BackgroundColor="#2196F3"
+                                          TextColor="White"
+                                          CornerRadius="8"
+                                          Clicked="OnDialogSaveClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+
+</ContentView>

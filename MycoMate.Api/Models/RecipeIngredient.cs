@@ -8,5 +8,7 @@ public class RecipeIngredient
     public Guid IngredientId { get; set; }
     public Ingredient Ingredient { get; set; } = null!;
 
-    public decimal Amount { get; set; }
+    public decimal WetAmount { get; set; }
+    public decimal WetAmountPercent { get; set; }
+    public decimal MoistureContent { get; set; }
 }

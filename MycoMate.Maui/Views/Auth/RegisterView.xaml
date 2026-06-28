@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:core="clr-namespace:Syncfusion.Maui.Core;assembly=Syncfusion.Maui.Core"
+             xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+             x:Class="MycoMate.Maui.Views.Auth.RegisterView">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="24,32" Spacing="0">
+
+            <!-- Logo -->
+            <Image Source="appicon.png"
+                   HeightRequest="64"
+                   WidthRequest="64"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,16" />
+
+            <!-- Title -->
+            <Label Text="Create an account"
+                   FontSize="22"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,24" />
+
+            <!-- Email -->
+            <core:SfTextInputLayout Hint="Email Address"
+                                    ContainerType="Outlined"
+                                    Margin="0,0,0,16">
+                <Entry x:Name="EmailEntry"
+                       Keyboard="Email" />
+            </core:SfTextInputLayout>
+
+            <!-- Password -->
+            <core:SfTextInputLayout Hint="Password"
+                                    ContainerType="Outlined"
+                                    EnablePasswordVisibilityToggle="True"
+                                    Margin="0,0,0,16">
+                <Entry x:Name="PasswordEntry"
+                       IsPassword="True" />
+            </core:SfTextInputLayout>
+
+            <!-- Confirm Password -->
+            <core:SfTextInputLayout Hint="Confirm Password"
+                                    ContainerType="Outlined"
+                                    EnablePasswordVisibilityToggle="True"
+                                    Margin="0,0,0,32">
+                <Entry x:Name="ConfirmPasswordEntry"
+                       IsPassword="True" />
+            </core:SfTextInputLayout>
+
+            <!-- Register button -->
+            <buttons:SfButton Text="Create Account"
+                              Background="#2196F3"
+                              TextColor="White"
+                              FontAttributes="Bold"
+                              FontSize="16"
+                              CornerRadius="8"
+                              HeightRequest="52"
+                              Clicked="OnRegisterClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentView>

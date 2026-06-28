@@ -10,6 +10,15 @@ public class RecipeIngredientConfiguration : IEntityTypeConfiguration<RecipeIngr
     {
         builder.HasKey(ri => new { ri.RecipeId, ri.IngredientId });
 
+        builder.Property(ri => ri.WetAmount)
+            .HasPrecision(10, 3);
+
+        builder.Property(ri => ri.WetAmountPercent)
+            .HasPrecision(7, 4);
+
+        builder.Property(ri => ri.MoistureContent)
+            .HasPrecision(5, 2);
+
         builder.HasOne(ri => ri.Recipe)
             .WithMany(r => r.Ingredients)
             .HasForeignKey(ri => ri.RecipeId)

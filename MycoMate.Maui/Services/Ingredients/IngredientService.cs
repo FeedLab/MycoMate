@@ -5,16 +5,16 @@ namespace MycoMate.Maui.Services.Ingredients;
 
 public class IngredientService(IMycoMateApiv1 api)
 {
-    public async Task CreateAsync(string shortName, string displayName, double moistureContent, string? information = null)
+    public async Task CreateAsync(Guid projectId, string shortName, string displayName, double moistureContent, string? information = null)
     {
         try
         {
-            await api.CreateIngredient(new CreateIngredientRequest
+            await api.CreateIngredient(projectId, new CreateIngredientRequest
             {
                 ShortName = shortName,
                 DisplayName = displayName,
                 MoistureContent = moistureContent,
-                Information = information
+                Information = information!
             });
         }
         catch (ApiException ex)

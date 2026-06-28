@@ -1,3 +1,3 @@
 namespace MycoMate.Api.Contracts.Responses;
 
-public record TokenResponse(string AccessToken);
+public record TokenResponse(string AccessToken, string RefreshToken);

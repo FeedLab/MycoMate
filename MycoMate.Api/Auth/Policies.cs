@@ -9,3 +9,8 @@ public static class Roles
 {
     public const string Owner = nameof(Owner);
 }
+
+public static class RateLimitPolicies
+{
+    public const string Register = nameof(Register);
+}

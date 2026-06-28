@@ -1,6 +1,8 @@
 using System.Text;
+using System.Threading.RateLimiting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
 using MycoMate.Api.Auth;
 using MycoMate.Api.Data;
@@ -43,6 +45,22 @@ public static class ServiceExtensions
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ISubstrateRecipeRepository, SubstrateRecipeRepository>();
         services.AddScoped<TokenService>();
+
+        services.AddRateLimiter(options =>
+        {
+            options.AddPolicy(RateLimitPolicies.Register, context =>
+                RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey: context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+                    factory: _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit          = 5,
+                        Window               = TimeSpan.FromMinutes(1),
+                        QueueProcessingOrder = QueueProcessingOrder.OldestFirst,
+                        QueueLimit           = 0
+                    }));
+
+            options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+        });
 
         return services;
     }

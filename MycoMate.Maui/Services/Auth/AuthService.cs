@@ -3,7 +3,7 @@ using Refit;
 
 namespace MycoMate.Maui.Services.Auth;
 
-public class AuthService(IMycoMateApiv1 api)
+public class AuthService(IMycoMateApiv1 api, CredentialStore credentialStore, TokenStore tokenStore)
 {
     public async Task RegisterAsync(string email, string password)
     {
@@ -21,11 +21,14 @@ public class AuthService(IMycoMateApiv1 api)
     {
         try
         {
-            await api.Login(new LoginRequest { Email = email, Password = password });
+            var response = await api.Login(new LoginRequest { Email = email, Password = password });
+            tokenStore.Set(response.AccessToken, response.RefreshToken);
+            await credentialStore.SaveAsync(email, password);
         }
         catch (ApiException ex)
         {
-            throw new ServiceException($"Login failed: {ex.ReasonPhrase}", ex);
+            throw new AuthException($"Login failed: {ex.ReasonPhrase}", ex);
         }
     }
+
 }
