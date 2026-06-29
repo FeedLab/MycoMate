@@ -16,8 +16,17 @@ public class RecipeIngredientConfiguration : IEntityTypeConfiguration<RecipeIngr
         builder.Property(ri => ri.WetAmountPercent)
             .HasPrecision(7, 4);
 
+        builder.Property(ri => ri.WetMatter)
+            .HasPrecision(10, 3);
+
         builder.Property(ri => ri.MoistureContent)
             .HasPrecision(5, 2);
+
+        builder.Property(ri => ri.DryMatter)
+            .HasPrecision(10, 3);
+
+        builder.Property(ri => ri.DryAmountPercent)
+            .HasPrecision(7, 4);
 
         builder.HasOne(ri => ri.Recipe)
             .WithMany(r => r.Ingredients)

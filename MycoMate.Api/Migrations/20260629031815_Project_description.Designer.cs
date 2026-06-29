@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MycoMate.Api.Data;
 
@@ -11,9 +12,11 @@ using MycoMate.Api.Data;
 namespace MycoMate.Api.Migrations
 {
     [DbContext(typeof(MycoMateDbContext))]
-    partial class MycoMateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260629031815_Project_description")]
+    partial class Project_description
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -318,14 +321,6 @@ namespace MycoMate.Api.Migrations
                     b.Property<Guid>("IngredientId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<decimal>("DryAmountPercent")
-                        .HasPrecision(7, 4)
-                        .HasColumnType("decimal(7,4)");
-
-                    b.Property<decimal>("DryMatter")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("decimal(10,3)");
-
                     b.Property<decimal>("MoistureContent")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
@@ -337,10 +332,6 @@ namespace MycoMate.Api.Migrations
                     b.Property<decimal>("WetAmountPercent")
                         .HasPrecision(7, 4)
                         .HasColumnType("decimal(7,4)");
-
-                    b.Property<decimal>("WetMatter")
-                        .HasPrecision(10, 3)
-                        .HasColumnType("decimal(10,3)");
 
                     b.HasKey("RecipeId", "IngredientId");
 
@@ -377,10 +368,6 @@ namespace MycoMate.Api.Migrations
 
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("WaterAdjustmentPercent")
-                        .HasPrecision(7, 4)
-                        .HasColumnType("decimal(7,4)");
 
                     b.HasKey("Id");
 

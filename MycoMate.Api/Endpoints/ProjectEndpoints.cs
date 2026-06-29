@@ -18,7 +18,7 @@ public static class ProjectEndpoints
             {
                 var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
                 var projects = await repo.GetVisibleToUserAsync(userId, ct);
-                var response = projects.Select(p => new ProjectResponse(p.Id, p.Name, p.Created, p.OwnerId));
+                var response = projects.Select(p => new ProjectResponse(p.Id, p.Name, p.Description, p.Created, p.OwnerId));
 
                 return TypedResults.Ok(response);
             })
@@ -37,7 +37,7 @@ public static class ProjectEndpoints
 
                 var project = await repo.GetByIdAsync(id, ct);
 
-                return TypedResults.Ok(new ProjectResponse(project!.Id, project.Name, project.Created, project.OwnerId));
+                return TypedResults.Ok(new ProjectResponse(project!.Id, project.Name, project.Description, project.Created, project.OwnerId));
             })
             .WithName("GetProject");
 
@@ -46,11 +46,11 @@ public static class ProjectEndpoints
             {
                 var userId = user.FindFirstValue(ClaimTypes.NameIdentifier)!;
 
-                var project = new Project { Name = req.Name, OwnerId = userId };
+                var project = new Project { Name = req.Name, Description = req.Description, OwnerId = userId };
 
                 await repo.AddAsync(project, ct);
 
-                var response = new ProjectResponse(project.Id, project.Name, project.Created, project.OwnerId);
+                var response = new ProjectResponse(project.Id, project.Name, project.Description, project.Created, project.OwnerId);
 
                 return Results.Created($"/projects/{project.Id}", response);
             })

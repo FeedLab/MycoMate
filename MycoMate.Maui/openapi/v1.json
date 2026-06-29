@@ -642,12 +642,19 @@
       },
       "CreateProjectRequest": {
         "required": [
-          "name"
+          "name",
+          "description"
         ],
         "type": "object",
         "properties": {
           "name": {
             "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -706,6 +713,7 @@
         "required": [
           "id",
           "name",
+          "description",
           "created",
           "ownerId"
         ],
@@ -717,6 +725,12 @@
           },
           "name": {
             "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "created": {
             "type": "string",
@@ -751,21 +765,6 @@
           }
         }
       },
-      "TokenResponse": {
-        "required": [
-          "accessToken",
-          "refreshToken"
-        ],
-        "type": "object",
-        "properties": {
-          "accessToken": {
-            "type": "string"
-          },
-          "refreshToken": {
-            "type": "string"
-          }
-        }
-      },
       "RefreshRequest": {
         "required": [
           "refreshToken"
@@ -788,6 +787,21 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenResponse": {
+        "required": [
+          "accessToken",
+          "refreshToken"
+        ],
+        "type": "object",
+        "properties": {
+          "accessToken": {
+            "type": "string"
+          },
+          "refreshToken": {
             "type": "string"
           }
         }

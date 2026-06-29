@@ -30,7 +30,8 @@ public static class SubstrateRecipeEndpoints
 
                 return Results.Ok(response);
             })
-            .WithName("GetSubstrateRecipes");
+            .WithName("GetSubstrateRecipes")
+            .Produces<IEnumerable<SubstrateRecipeResponse>>();
 
         group.MapGet("/{id:guid}", async (Guid projectId, Guid id, ClaimsPrincipal user,
                 IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
@@ -179,7 +180,7 @@ public static class SubstrateRecipeEndpoints
 
                 var ingredients = recipe!.Ingredients.Select(ri => new RecipeIngredientResponse(
                     ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
-                    ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent));
+                    ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent, ri.WetMatter, ri.DryMatter, ri.DryAmountPercent));
 
                 return Results.Ok(ingredients);
             })
@@ -217,8 +218,8 @@ public static class SubstrateRecipeEndpoints
     }
 
     private static SubstrateRecipeResponse ToResponse(SubstrateRecipe r) =>
-        new(r.Id, r.Name, r.Description, r.MoistureContentTarget, r.FinalMixtureSizeKg, r.Created, r.ProjectId,
+        new(r.Id, r.Name, r.Description, r.MoistureContentTarget, r.FinalMixtureSizeKg, r.WaterAdjustmentPercent, r.Created, r.ProjectId,
             r.Ingredients.Select(ri => new RecipeIngredientResponse(
                 ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
-                ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent)));
+                ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent, ri.WetMatter, ri.DryMatter, ri.DryAmountPercent)));
 }

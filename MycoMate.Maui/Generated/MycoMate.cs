@@ -98,10 +98,11 @@ namespace MycoMate.Maui.Api
         Task DeleteProject(System.Guid projectId);
 
         /// <param name="projectId">projectId parameter</param>
-        /// <returns>A <see cref="Task"/> that completes when the request is finished.</returns>
+        /// <returns>OK</returns>
         /// <exception cref="ApiException">Thrown when the request returns a non-success status code.</exception>
+        [Headers("Accept: application/json")]
         [Get("/projects/{projectId}/recipes")]
-        Task GetSubstrateRecipes(System.Guid projectId);
+        Task<ICollection<SubstrateRecipeResponse>> GetSubstrateRecipes(System.Guid projectId);
 
         /// <param name="projectId">projectId parameter</param>
         /// <param name="body">body parameter</param>
@@ -246,6 +247,9 @@ namespace MycoMate.Maui.Api
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
         private IDictionary<string, object> _additionalProperties;
 
         [JsonExtensionData]
@@ -324,6 +328,9 @@ namespace MycoMate.Maui.Api
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public string Name { get; set; }
 
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
         [JsonPropertyName("created")]
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         public System.DateTimeOffset Created { get; set; }
@@ -355,29 +362,6 @@ namespace MycoMate.Maui.Api
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
         public double WetAmount { get; set; }
-
-        private IDictionary<string, object> _additionalProperties;
-
-        [JsonExtensionData]
-        public IDictionary<string, object> AdditionalProperties
-        {
-            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
-            set { _additionalProperties = value; }
-        }
-
-    }
-
-    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
-    public partial class TokenResponse
-    {
-
-        [JsonPropertyName("accessToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string AccessToken { get; set; }
-
-        [JsonPropertyName("refreshToken")]
-        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
-        public string RefreshToken { get; set; }
 
         private IDictionary<string, object> _additionalProperties;
 
@@ -433,6 +417,29 @@ namespace MycoMate.Maui.Api
     }
 
     [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class TokenResponse
+    {
+
+        [JsonPropertyName("accessToken")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string AccessToken { get; set; }
+
+        [JsonPropertyName("refreshToken")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string RefreshToken { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
     public partial class UpdateSubstrateRecipeRequest
     {
 
@@ -452,6 +459,75 @@ namespace MycoMate.Maui.Api
         [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
         [System.ComponentModel.DataAnnotations.RegularExpression(@"^-?(?:0|[1-9]\d*)(?:\.\d+)?$")]
         public double FinalMixtureSizeKg { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class RecipeIngredientResponse
+    {
+
+        [JsonPropertyName("ingredientId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid IngredientId { get; set; }
+
+        [JsonPropertyName("shortName")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string ShortName { get; set; }
+
+        [JsonPropertyName("displayName")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string DisplayName { get; set; }
+
+        [JsonPropertyName("moistureContent")]
+        public double MoistureContent { get; set; }
+
+        [JsonPropertyName("wetAmount")]
+        public double WetAmount { get; set; }
+
+        [JsonPropertyName("wetAmountPercent")]
+        public double WetAmountPercent { get; set; }
+
+        private IDictionary<string, object> _additionalProperties;
+
+        [JsonExtensionData]
+        public IDictionary<string, object> AdditionalProperties
+        {
+            get { return _additionalProperties ?? (_additionalProperties = new Dictionary<string, object>()); }
+            set { _additionalProperties = value; }
+        }
+
+    }
+
+    [System.CodeDom.Compiler.GeneratedCode("NJsonSchema", "14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))")]
+    public partial class SubstrateRecipeResponse
+    {
+
+        [JsonPropertyName("id")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid Id { get; set; }
+
+        [JsonPropertyName("name")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public string Name { get; set; }
+
+        [JsonPropertyName("description")]
+        public string Description { get; set; }
+
+        [JsonPropertyName("projectId")]
+        [System.ComponentModel.DataAnnotations.Required(AllowEmptyStrings = true)]
+        public System.Guid ProjectId { get; set; }
+
+        [JsonPropertyName("ingredients")]
+        public ICollection<RecipeIngredientResponse> Ingredients { get; set; } = new List<RecipeIngredientResponse>();
 
         private IDictionary<string, object> _additionalProperties;
 

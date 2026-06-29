@@ -1,4 +1,6 @@
-﻿using CommunityToolkit.Maui;
+﻿using System.Reflection;
+using CommunityToolkit.Maui;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using MycoMate.Maui.Extensions;
 using MycoMate.Maui.Services;
@@ -38,11 +40,24 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
             });
 
-#if ANDROID
-        builder.Services.AddMycoMateApiClient("https://10.0.2.2:7010"); // Android emulator → host machine
-#else
-        builder.Services.AddMycoMateApiClient("https://localhost:7010");
+        var assembly = Assembly.GetExecutingAssembly();
+
+        using (var stream = assembly.GetManifestResourceStream("MycoMate.Maui.appsettings.json"))
+            builder.Configuration.AddJsonStream(stream!);
+
+#if DEBUG
+        using (var stream = assembly.GetManifestResourceStream("MycoMate.Maui.appsettings.Development.json"))
+            if (stream is not null)
+                builder.Configuration.AddJsonStream(stream);
 #endif
+
+#if ANDROID && DEBUG
+        var baseAddress = builder.Configuration["Api:AndroidBaseUrl"]!;
+#else
+        var baseAddress = builder.Configuration["Api:BaseUrl"]!;
+#endif
+
+        builder.Services.AddMycoMateApiClient(baseAddress);
 
 #if DEBUG
         builder.Logging.AddDebug();

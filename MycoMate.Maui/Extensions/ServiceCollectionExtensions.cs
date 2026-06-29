@@ -3,6 +3,7 @@ using MycoMate.Maui.PopupView;
 using MycoMate.Maui.Services.Auth;
 using MycoMate.Maui.Services.Ingredients;
 using MycoMate.Maui.Services.Projects;
+using MycoMate.Maui.Services.SubstrateRecipes;
 using MycoMate.Maui.ViewModels;
 using Refit;
 
@@ -59,6 +60,7 @@ internal static class ServiceCollectionExtensions
         services.AddSingleton<AuthService>();
         services.AddSingleton<IngredientService>();
         services.AddSingleton<ProjectService>();
+        services.AddSingleton<SubstrateRecipeService>();
         services.AddTransient<AuthPopup>();
         services.AddTransient<ProjectsViewModel>();
 

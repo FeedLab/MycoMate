@@ -9,6 +9,8 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
     public async Task<IEnumerable<SubstrateRecipe>> GetAllAsync(Guid projectId, CancellationToken ct = default)
     {
         return await db.SubstrateRecipes
+            .Include(r => r.Ingredients)
+                .ThenInclude(ri => ri.Ingredient)
             .Where(r => r.ProjectId == projectId)
             .ToListAsync(ct);
     }
@@ -110,21 +112,47 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
 
     private async Task RecalculateWetAmountPercentsAsync(Guid recipeId, CancellationToken ct)
     {
+        var recipe = await db.SubstrateRecipes.FindAsync([recipeId], ct);
+
+        if (recipe is null)
+        {
+            return;
+        }
+
         var all = await db.RecipeIngredients
             .Where(ri => ri.RecipeId == recipeId)
             .ToListAsync(ct);
 
-        var total = all.Sum(ri => ri.WetAmount);
+        var totalWet = all.Sum(ri => ri.WetAmount);
 
-        if (total == 0)
+        if (totalWet == 0)
         {
             return;
         }
 
         foreach (var ri in all)
         {
-            ri.WetAmountPercent = Math.Round(ri.WetAmount / total * 100m, 4);
+            ri.WetAmountPercent = Math.Round(ri.WetAmount / totalWet * 100m, 4);
+            ri.WetMatter        = Math.Round(recipe.FinalMixtureSizeKg * (ri.WetAmountPercent / 100m), 3);
+            ri.DryMatter        = Math.Round(ri.WetMatter * (1m - ri.MoistureContent / 100m), 3);
         }
+
+        var totalDry = all.Sum(ri => ri.DryMatter);
+
+        if (totalDry > 0)
+        {
+            foreach (var ri in all)
+            {
+                ri.DryAmountPercent = Math.Round(ri.DryMatter / totalDry * 100m, 4);
+            }
+        }
+
+        var currentWaterKg = recipe.FinalMixtureSizeKg - totalDry;
+        var targetWaterKg  = recipe.FinalMixtureSizeKg * (recipe.MoistureContentTarget / 100m);
+
+        recipe.WaterAdjustmentPercent = recipe.FinalMixtureSizeKg > 0
+            ? Math.Round((targetWaterKg - currentWaterKg) / recipe.FinalMixtureSizeKg * 100m, 4)
+            : 0m;
 
         await db.SaveChangesAsync(ct);
     }

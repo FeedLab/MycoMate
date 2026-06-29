@@ -2,6 +2,7 @@ using MycoMate.Maui.Models;
 using MycoMate.Maui.Services;
 using MycoMate.Maui.ViewModels;
 
+
 namespace MycoMate.Maui.Views.Projects;
 
 public partial class ProjectsView : ContentView
@@ -11,11 +12,24 @@ public partial class ProjectsView : ContentView
     public ProjectsView()
     {
         InitializeComponent();
-        
+
         var vm = AppService.GetRequiredService<ProjectsViewModel>();
         BindingContext = vm;
 
         vm.Projects.CollectionChanged += (_, _) => EmptyState.IsVisible = vm.Projects.Count == 0;
+    }
+
+    private void OnHeaderTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is BindableObject { BindingContext: Project project })
+            project.IsExpanded = !project.IsExpanded;
+    }
+
+    private void OnRecipeTapped(object sender, TappedEventArgs e)
+    {
+        if (sender is not BindableObject { BindingContext: SubstrateRecipe recipe }) return;
+        if (BindingContext is not ProjectsViewModel vm) return;
+        vm.SelectRecipeCommand.Execute(recipe);
     }
 
     private void OnAddClicked(object sender, EventArgs e)
@@ -23,17 +37,6 @@ public partial class ProjectsView : ContentView
         editingProject = null;
         DialogTitle.Text = "New Project";
         ProjectNameEntry.Text = string.Empty;
-        DialogOverlay.IsVisible = true;
-        ProjectNameEntry.Focus();
-    }
-
-    private void OnEditClicked(object sender, EventArgs e)
-    {
-        if (sender is not BindableObject { BindingContext: Project project }) return;
-
-        editingProject = project;
-        DialogTitle.Text = "Edit Project";
-        ProjectNameEntry.Text = project.Name;
         DialogOverlay.IsVisible = true;
         ProjectNameEntry.Focus();
     }

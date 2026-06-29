@@ -5,7 +5,9 @@ using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using MycoMate.Maui.Messages;
 using MycoMate.Maui.Models;
+using MycoMate.Maui.Services.Auth;
 using MycoMate.Maui.Services.Projects;
+using MycoMate.Maui.Services.SubstrateRecipes;
 
 namespace MycoMate.Maui.ViewModels;
 
@@ -17,20 +19,26 @@ public partial class ProjectsViewModel : ObservableObject
     bool isLoading;
 
     [ObservableProperty]
-    Project? selectedProject;
+    [NotifyPropertyChangedFor(nameof(HasSelectedRecipe))]
+    SubstrateRecipe? selectedRecipe;
+
+    public bool HasSelectedRecipe => SelectedRecipe is not null;
 
     private readonly ProjectService projectService;
+    private readonly SubstrateRecipeService recipeService;
+    private readonly TokenStore tokenStore;
     private readonly ILogger<ProjectsViewModel> logger;
 
-    /// <inheritdoc/>
-    public ProjectsViewModel(ProjectService projectService, ILogger<ProjectsViewModel> logger)
+    public ProjectsViewModel(ProjectService projectService, SubstrateRecipeService recipeService, TokenStore tokenStore, ILogger<ProjectsViewModel> logger)
     {
         this.projectService = projectService;
+        this.recipeService = recipeService;
+        this.tokenStore = tokenStore;
         this.logger = logger;
-        
+
         CreateUserLoggedInSubscription();
     }
-    
+
     private void CreateUserLoggedInSubscription()
     {
         WeakReferenceMessenger.Default.Register<UserLoggedInMessage>(this, (r, m) =>
@@ -41,13 +49,27 @@ public partial class ProjectsViewModel : ObservableObject
                 try
                 {
                     var result = await projectService.GetAllAsync();
-                    
                     Projects.Clear();
-                    
+
+                    var userId = tokenStore.UserId;
                     foreach (var p in result)
                     {
-                        Projects.Add(new Project { Id = p.Id, Name = p.Name });
+                        var project = new Project
+                        {
+                            Id = p.Id,
+                            Name = p.Name,
+                            Description = p.Description,
+                            Role = p.OwnerId == userId ? ProjectRole.Owner : ProjectRole.Viewer
+                        };
+
+                        var recipes = await recipeService.GetAllAsync(project.Id);
+                        foreach (var r in recipes)
+                            project.Recipes.Add(r);
+
+                        Projects.Add(project);
                     }
+
+                    logger.LogInformation("Loaded {ProjectCount} projects", Projects.Count);
                 }
                 catch (Exception ex)
                 {
@@ -57,31 +79,9 @@ public partial class ProjectsViewModel : ObservableObject
                 {
                     IsLoading = false;
                 }
-
             });
         });
     }
-
-    // [RelayCommand]
-    // async Task LoadAsync()
-    // {
-    //     IsLoading = true;
-    //     try
-    //     {
-    //         var result = await projectService.GetAllAsync();
-    //         Projects.Clear();
-    //         foreach (var p in result)
-    //             Projects.Add(new Project { Id = p.Id, Name = p.Name });
-    //     }
-    //     catch (Exception ex)
-    //     {
-    //         logger.LogError(ex, "Failed to load projects");
-    //     }
-    //     finally
-    //     {
-    //         IsLoading = false;
-    //     }
-    // }
 
     [RelayCommand]
     async Task AddAsync(string name)
@@ -123,7 +123,6 @@ public partial class ProjectsViewModel : ObservableObject
         if (project is null) return;
         try
         {
-            // TODO: call update endpoint once available in API
             project.Name = args.Name;
             var index = Projects.IndexOf(project);
             Projects[index] = project;
@@ -133,6 +132,31 @@ public partial class ProjectsViewModel : ObservableObject
         {
             logger.LogError(ex, "Failed to edit project {Id}", args.Id);
             throw;
+        }
+    }
+
+    [RelayCommand]
+    void SelectRecipe(SubstrateRecipe recipe)
+    {
+        if (SelectedRecipe is not null)
+            SelectedRecipe.IsSelected = false;
+        SelectedRecipe = recipe;
+        recipe.IsSelected = true;
+    }
+
+    [RelayCommand]
+    async Task LoadRecipesAsync(Project project)
+    {
+        try
+        {
+            var recipes = await recipeService.GetAllAsync(project.Id);
+            project.Recipes.Clear();
+            foreach (var r in recipes)
+                project.Recipes.Add(r);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load recipes for project {Id}", project.Id);
         }
     }
 }

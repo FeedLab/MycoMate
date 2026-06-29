@@ -6,6 +6,7 @@ public record SubstrateRecipeResponse(
     string? Description,
     decimal MoistureContentTarget,
     decimal FinalMixtureSizeKg,
+    decimal WaterAdjustmentPercent,
     DateTime Created,
     Guid ProjectId,
     IEnumerable<RecipeIngredientResponse> Ingredients);

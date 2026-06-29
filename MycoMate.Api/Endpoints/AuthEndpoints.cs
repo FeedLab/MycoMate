@@ -52,7 +52,8 @@ public static class AuthEndpoints
             })
             .WithName("Login")
             .WithTags("Auth")
-            .AllowAnonymous();
+            .AllowAnonymous()
+            .Produces<TokenResponse>();
 
         app.MapPost("/refresh", async (RefreshRequest req, TokenService tokenService) =>
             {
@@ -69,7 +70,8 @@ public static class AuthEndpoints
             })
             .WithName("Refresh")
             .WithTags("Auth")
-            .AllowAnonymous();
+            .AllowAnonymous()
+            .Produces<TokenResponse>();
 
         // OAuth2 password grant — used by Scalar to auto-fetch and store tokens
         app.MapPost("/connect/token", async (HttpRequest request, UserManager<IdentityUser> userManager,

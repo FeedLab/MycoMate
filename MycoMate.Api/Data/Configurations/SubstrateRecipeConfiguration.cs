@@ -16,6 +16,9 @@ public class SubstrateRecipeConfiguration : IEntityTypeConfiguration<SubstrateRe
         builder.Property(r => r.FinalMixtureSizeKg)
             .HasPrecision(10, 3);
 
+        builder.Property(r => r.WaterAdjustmentPercent)
+            .HasPrecision(7, 4);
+
         builder.HasOne(r => r.Project)
             .WithMany()
             .HasForeignKey(r => r.ProjectId)

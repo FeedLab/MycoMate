@@ -9,6 +9,7 @@ public class SubstrateRecipe
     [MaxLength(1000)] public string? Description { get; set; }
     public decimal MoistureContentTarget { get; set; }
     public decimal FinalMixtureSizeKg { get; set; }
+    public decimal WaterAdjustmentPercent { get; set; }
     public DateTime Created { get; init; } = DateTime.UtcNow;
 
     public Guid ProjectId { get; set; }
