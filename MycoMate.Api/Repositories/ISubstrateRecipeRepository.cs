@@ -10,6 +10,6 @@ public interface ISubstrateRecipeRepository
     Task<bool> UpdateAsync(SubstrateRecipe recipe, CancellationToken ct = default);
     Task<bool> DeleteAsync(Guid projectId, Guid id, CancellationToken ct = default);
 
-    Task<bool> AddOrUpdateIngredientAsync(Guid recipeId, Guid ingredientId, decimal amount, CancellationToken ct = default);
+    Task<bool> AddOrUpdateIngredientAsync(Guid recipeId, Guid ingredientId, decimal dryPercent, CancellationToken ct = default);
     Task<bool> RemoveIngredientAsync(Guid recipeId, Guid ingredientId, CancellationToken ct = default);
 }

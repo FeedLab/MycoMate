@@ -53,7 +53,8 @@ public static class SubstrateRecipeEndpoints
 
                 return Results.Ok(ToResponse(recipe));
             })
-            .WithName("GetSubstrateRecipe");
+            .WithName("GetSubstrateRecipe")
+            .Produces<SubstrateRecipeResponse>();
 
         group.MapPost("/", async (Guid projectId, CreateSubstrateRecipeRequest req, ClaimsPrincipal user,
                 IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo, CancellationToken ct) =>
@@ -84,7 +85,8 @@ public static class SubstrateRecipeEndpoints
 
                 return Results.Created($"/projects/{projectId}/recipes/{recipe.Id}", ToResponse(recipe));
             })
-            .WithName("CreateSubstrateRecipe");
+            .WithName("CreateSubstrateRecipe")
+            .Produces<SubstrateRecipeResponse>(StatusCodes.Status201Created);
 
         group.MapPut("/{id:guid}", async (Guid projectId, Guid id, UpdateSubstrateRecipeRequest req,
                 ClaimsPrincipal user, IProjectRepository projectRepo, ISubstrateRecipeRepository recipeRepo,
@@ -169,7 +171,7 @@ public static class SubstrateRecipeEndpoints
                     return Results.Forbid();
                 }
 
-                var ok = await recipeRepo.AddOrUpdateIngredientAsync(id, ingredientId, req.WetAmount, ct);
+                var ok = await recipeRepo.AddOrUpdateIngredientAsync(id, ingredientId, req.DryPercent, ct);
 
                 if (!ok)
                 {
@@ -178,13 +180,10 @@ public static class SubstrateRecipeEndpoints
 
                 var recipe = await recipeRepo.GetByIdAsync(projectId, id, ct);
 
-                var ingredients = recipe!.Ingredients.Select(ri => new RecipeIngredientResponse(
-                    ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
-                    ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent, ri.WetMatter, ri.DryMatter, ri.DryAmountPercent));
-
-                return Results.Ok(ingredients);
+                return Results.Ok(ToResponse(recipe!));
             })
-            .WithName("SetRecipeIngredient");
+            .WithName("SetRecipeIngredient")
+            .Produces<SubstrateRecipeResponse>();
 
         group.MapDelete("/{id:guid}/ingredients/{ingredientId:guid}", async (Guid projectId, Guid id,
                 Guid ingredientId, ClaimsPrincipal user, IProjectRepository projectRepo,
@@ -221,5 +220,5 @@ public static class SubstrateRecipeEndpoints
         new(r.Id, r.Name, r.Description, r.MoistureContentTarget, r.FinalMixtureSizeKg, r.WaterAdjustmentPercent, r.Created, r.ProjectId,
             r.Ingredients.Select(ri => new RecipeIngredientResponse(
                 ri.IngredientId, ri.Ingredient?.ShortName ?? "", ri.Ingredient?.DisplayName ?? "",
-                ri.MoistureContent, ri.WetAmount, ri.WetAmountPercent, ri.WetMatter, ri.DryMatter, ri.DryAmountPercent)));
+                ri.MoistureContent, ri.DryPercent)));
 }

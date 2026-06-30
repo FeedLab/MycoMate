@@ -5,8 +5,4 @@ public record RecipeIngredientResponse(
     string ShortName,
     string DisplayName,
     decimal MoistureContent,
-    decimal WetAmount,
-    decimal WetAmountPercent,
-    decimal WetMatter,
-    decimal DryMatter,
-    decimal DryAmountPercent);
+    decimal DryPercent);

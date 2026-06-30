@@ -22,17 +22,15 @@ public static class IngredientEndpoints
                 var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
 
                 if (project is null || role is null)
-                {
                     return Results.NotFound();
-                }
 
                 var ingredients = await ingredientRepo.GetVisibleAsync(project.OwnerId, ct);
-                var response = ingredients.Select(i => new IngredientResponse(
-                    i.Id, i.ShortName, i.DisplayName, i.Information, i.MoistureContent, i.Created));
+                var response = ingredients.Select(ToResponse);
 
                 return Results.Ok(response);
             })
-            .WithName("GetIngredients");
+            .WithName("GetIngredients")
+            .Produces<IEnumerable<IngredientResponse>>();
 
         group.MapPost("/", async (Guid projectId, CreateIngredientRequest req, ClaimsPrincipal user,
                 IProjectRepository projectRepo, IIngredientRepository ingredientRepo, CancellationToken ct) =>
@@ -41,36 +39,53 @@ public static class IngredientEndpoints
                 var role = await projectRepo.GetUserRoleAsync(projectId, userId, ct);
 
                 if (role is null)
-                {
                     return Results.NotFound();
-                }
 
                 if (role < ProjectRole.Editor)
-                {
                     return Results.Forbid();
-                }
 
                 var project = await projectRepo.GetByIdAsync(projectId, ct);
 
                 var ingredient = new Ingredient
                 {
-                    ShortName       = req.ShortName,
-                    DisplayName     = req.DisplayName,
-                    Information     = req.Information,
-                    MoistureContent = req.MoistureContent,
-                    UserId          = project!.OwnerId
+                    ShortName             = req.ShortName,
+                    DisplayName           = req.DisplayName,
+                    Information           = req.Information,
+                    MoistureContent       = req.MoistureContent,
+                    CarbonToNitrogenRatio = req.CarbonToNitrogenRatio,
+                    PhLevel               = req.PhLevel,
+                    Function              = req.Function,
+                    BulkDensityKgPerM3    = req.BulkDensityKgPerM3,
+                    UserId                = project!.OwnerId
                 };
+
+                if (req.Minerals != null)
+                    foreach (var m in req.Minerals)
+                        ingredient.Minerals.Add(new IngredientMineral { MineralId = m.NutrientId, Value = m.Value });
+
+                if (req.Vitamins != null)
+                    foreach (var v in req.Vitamins)
+                        ingredient.Vitamins.Add(new IngredientVitamin { VitaminId = v.NutrientId, Value = v.Value });
+
+                if (req.AminoAcids != null)
+                    foreach (var a in req.AminoAcids)
+                        ingredient.AminoAcids.Add(new IngredientAminoAcid { AminoAcidId = a.NutrientId, Value = a.Value });
 
                 await ingredientRepo.AddAsync(ingredient, ct);
 
-                var response = new IngredientResponse(
-                    ingredient.Id, ingredient.ShortName, ingredient.DisplayName,
-                    ingredient.Information, ingredient.MoistureContent, ingredient.Created);
-
-                return Results.Created($"/projects/{projectId}/ingredients/{ingredient.Id}", response);
+                return Results.Created($"/projects/{projectId}/ingredients/{ingredient.Id}", ToResponse(ingredient));
             })
-            .WithName("CreateIngredient");
+            .WithName("CreateIngredient")
+            .Produces<IngredientResponse>(StatusCodes.Status201Created);
 
         return app;
     }
+
+    private static IngredientResponse ToResponse(Ingredient i) => new(
+        i.Id, i.ShortName, i.DisplayName, i.Information, i.MoistureContent,
+        i.CarbonToNitrogenRatio, i.PhLevel, i.Function, i.BulkDensityKgPerM3,
+        i.Minerals.Select(m => new NutrientValueResponse(m.MineralId, m.Mineral.Name, m.Mineral.ShortName, m.Mineral.Description, m.Value, m.Mineral.Unit)).ToList(),
+        i.Vitamins.Select(v => new NutrientValueResponse(v.VitaminId, v.Vitamin.Name, v.Vitamin.ShortName, v.Vitamin.Description, v.Value, v.Vitamin.Unit)).ToList(),
+        i.AminoAcids.Select(a => new NutrientValueResponse(a.AminoAcidId, a.AminoAcid.Name, a.AminoAcid.ShortName, a.AminoAcid.Description, a.Value, a.AminoAcid.Unit)).ToList(),
+        i.Created);
 }

@@ -143,7 +143,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IngredientResponse"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -174,8 +184,15 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IngredientResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -218,8 +235,15 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -243,7 +267,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -357,7 +388,17 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubstrateRecipeResponse"
+                  }
+                }
+              }
+            }
           }
         }
       },
@@ -388,8 +429,15 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubstrateRecipeResponse"
+                }
+              }
+            }
           }
         }
       }
@@ -422,7 +470,14 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubstrateRecipeResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -546,7 +601,14 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubstrateRecipeResponse"
+                }
+              }
+            }
           }
         }
       },
@@ -614,7 +676,14 @@
           "shortName",
           "displayName",
           "information",
-          "moistureContent"
+          "moistureContent",
+          "carbonToNitrogenRatio",
+          "phLevel",
+          "function",
+          "bulkDensityKgPerM3",
+          "minerals",
+          "vitamins",
+          "aminoAcids"
         ],
         "type": "object",
         "properties": {
@@ -637,6 +706,66 @@
               "string"
             ],
             "format": "double"
+          },
+          "carbonToNitrogenRatio": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "phLevel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "function": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bulkDensityKgPerM3": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "minerals": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueRequest"
+            }
+          },
+          "vitamins": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueRequest"
+            }
+          },
+          "aminoAcids": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueRequest"
+            }
           }
         }
       },
@@ -694,6 +823,105 @@
           }
         }
       },
+      "IngredientResponse": {
+        "required": [
+          "id",
+          "shortName",
+          "displayName",
+          "information",
+          "moistureContent",
+          "carbonToNitrogenRatio",
+          "phLevel",
+          "function",
+          "bulkDensityKgPerM3",
+          "minerals",
+          "vitamins",
+          "aminoAcids",
+          "created"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "information": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "moistureContent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "carbonToNitrogenRatio": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "phLevel": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "function": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "bulkDensityKgPerM3": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "null",
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "minerals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueResponse"
+            }
+          },
+          "vitamins": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueResponse"
+            }
+          },
+          "aminoAcids": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NutrientValueResponse"
+            }
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
       "LoginRequest": {
         "required": [
           "email",
@@ -705,6 +933,67 @@
             "type": "string"
           },
           "password": {
+            "type": "string"
+          }
+        }
+      },
+      "NutrientValueRequest": {
+        "required": [
+          "nutrientId",
+          "value"
+        ],
+        "type": "object",
+        "properties": {
+          "nutrientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "value": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "NutrientValueResponse": {
+        "required": [
+          "nutrientId",
+          "name",
+          "shortName",
+          "description",
+          "value",
+          "unit"
+        ],
+        "type": "object",
+        "properties": {
+          "nutrientId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "value": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "unit": {
             "type": "string"
           }
         }
@@ -746,8 +1035,27 @@
       },
       "RecipeIngredientRequest": {
         "required": [
+          "dryPercent"
+        ],
+        "type": "object",
+        "properties": {
+          "dryPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          }
+        }
+      },
+      "RecipeIngredientResponse": {
+        "required": [
           "ingredientId",
-          "wetAmount"
+          "shortName",
+          "displayName",
+          "moistureContent",
+          "dryPercent"
         ],
         "type": "object",
         "properties": {
@@ -755,7 +1063,21 @@
             "type": "string",
             "format": "uuid"
           },
-          "wetAmount": {
+          "shortName": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "moistureContent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "dryPercent": {
             "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
             "type": [
               "number",
@@ -788,6 +1110,73 @@
           },
           "password": {
             "type": "string"
+          }
+        }
+      },
+      "SubstrateRecipeResponse": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "moistureContentTarget",
+          "finalMixtureSizeKg",
+          "waterAdjustmentPercent",
+          "created",
+          "projectId",
+          "ingredients"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "moistureContentTarget": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "finalMixtureSizeKg": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "waterAdjustmentPercent": {
+            "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?$",
+            "type": [
+              "number",
+              "string"
+            ],
+            "format": "double"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "projectId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "ingredients": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RecipeIngredientResponse"
+            }
           }
         }
       },

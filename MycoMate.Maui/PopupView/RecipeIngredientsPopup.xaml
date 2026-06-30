@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:dataGrid="clr-namespace:Syncfusion.Maui.DataGrid;assembly=Syncfusion.Maui.DataGrid"
+               xmlns:inputs="clr-namespace:Syncfusion.Maui.Inputs;assembly=Syncfusion.Maui.Inputs"
+               xmlns:buttons="clr-namespace:Syncfusion.Maui.Buttons;assembly=Syncfusion.Maui.Buttons"
+               xmlns:models="clr-namespace:MycoMate.Maui.Models"
+               x:Class="MycoMate.Maui.PopupView.RecipeIngredientsPopup"
+               x:DataType="models:SubstrateRecipe"
+               CanBeDismissedByTappingOutsideOfPopup="True"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
+
+    <Border x:Name="ContentBorder"
+            StrokeShape="RoundRectangle 16"
+            BackgroundColor="White"
+            Padding="0">
+        <Grid RowDefinitions="Auto,Auto,Auto,Auto,Auto,*,Auto"
+              RowSpacing="0">
+
+            <!-- Header: recipe name + close -->
+            <Grid Grid.Row="0"
+                  Padding="24,20,16,8"
+                  ColumnDefinitions="*,Auto">
+                <Label Grid.Column="0"
+                       Text="{Binding Name}"
+                       FontSize="18"
+                       FontAttributes="Bold"
+                       TextColor="#212121"
+                       VerticalOptions="Center" />
+                <buttons:SfButton Grid.Column="1"
+                                  Text="✕"
+                                  BackgroundColor="Transparent"
+                                  TextColor="#9E9E9E"
+                                  FontSize="16"
+                                  HeightRequest="36"
+                                  WidthRequest="36"
+                                  CornerRadius="18"
+                                  Clicked="OnCloseClicked" />
+            </Grid>
+
+            <Border
+                Grid.Row="1"
+                Margin="20,8"
+                HorizontalOptions="Fill"
+                VerticalOptions="Center"
+                Background="AliceBlue"
+                Stroke="#B2FFFF"
+                StrokeThickness="1">
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="3" />
+                </Border.StrokeShape>
+
+                <!-- Description -->
+                <Label
+                    Margin="8"
+                    Text="{Binding Description}"
+                    FontSize="11"
+                    TextColor="#757575"
+                    LineBreakMode="WordWrap" />
+
+            </Border>
+
+
+            <!-- Batch size + water fields -->
+            <Grid Grid.Row="2"
+                  Padding="24,0,24,12"
+                  ColumnDefinitions="*,*"
+                  ColumnSpacing="20">
+
+                <!-- Batch size (editable) -->
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Batch size (kg)"
+                           FontSize="11"
+                           TextColor="#757575" />
+                    <inputs:SfNumericEntry x:Name="BatchSizeEntry"
+                                           CustomFormat="F2"
+                                           Minimum="0"
+                                           ValueChanged="OnBatchSizeChanged" />
+                </VerticalStackLayout>
+
+                <!-- Water to add (read-only) -->
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                    <Label Text="Water to add (kg)"
+                           FontSize="11"
+                           TextColor="#757575" />
+                    <Label Text="{Binding WaterKg, StringFormat='{0:F3}'}"
+                           FontSize="16"
+                           FontAttributes="Bold"
+                           TextColor="#2196F3"
+                           VerticalOptions="Center" />
+                </VerticalStackLayout>
+            </Grid>
+
+            <!-- Divider -->
+            <BoxView Grid.Row="3" HeightRequest="1" Color="#E0E0E0" />
+
+            <!-- Ingredients header + Add button -->
+            <Grid Grid.Row="4"
+                  Padding="24,10,24,8"
+                  ColumnDefinitions="*,Auto">
+
+                <buttons:SfButton Grid.Column="1"
+                                  Text="+ Add"
+                                  BackgroundColor="#2196F3"
+                                  TextColor="White"
+                                  FontSize="12"
+                                  CornerRadius="6"
+                                  HeightRequest="32"
+                                  Padding="8,0"
+                                  Clicked="OnAddIngredientClicked" />
+            </Grid>
+
+            <!-- Ingredients data grid -->
+
+
+            <!-- Close button -->
+            <buttons:SfButton Grid.Row="6"
+                              Text="Close"
+                              BackgroundColor="#E0E0E0"
+                              TextColor="#424242"
+                              CornerRadius="0"
+                              HeightRequest="48"
+                              Clicked="OnCloseClicked" />
+
+        </Grid>
+    </Border>
+
+</toolkit:Popup>

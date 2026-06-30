@@ -1,7 +1,9 @@
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using MycoMate.Maui.Models;
+using MycoMate.Maui.PopupView;
 using MycoMate.Maui.Services;
 using MycoMate.Maui.ViewModels;
-
 
 namespace MycoMate.Maui.Views.Projects;
 
@@ -25,11 +27,15 @@ public partial class ProjectsView : ContentView
             project.IsExpanded = !project.IsExpanded;
     }
 
-    private void OnRecipeTapped(object sender, TappedEventArgs e)
+    private async void OnRecipeTapped(object sender, TappedEventArgs e)
     {
         if (sender is not BindableObject { BindingContext: SubstrateRecipe recipe }) return;
         if (BindingContext is not ProjectsViewModel vm) return;
+
         vm.SelectRecipeCommand.Execute(recipe);
+
+        var popup = new RecipeIngredientsPopup(recipe, vm);
+        await Application.Current!.Windows[0].Page!.ShowPopupAsync(popup);
     }
 
     private void OnAddClicked(object sender, EventArgs e)

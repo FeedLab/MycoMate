@@ -14,236 +14,154 @@
         <ResourceDictionary>
             <local:RoleToColorConverter x:Key="RoleColor" />
             <local:RoleToSymbolConverter x:Key="RoleSymbol" />
-            <local:SelectedBackgroundConverter x:Key="SelectedBg" />
         </ResourceDictionary>
     </ContentView.Resources>
 
-    <!-- Two-column layout -->
-    <Grid ColumnDefinitions="*,1.4*">
+    <Grid>
 
-        <!-- ══════════════════════════════════════════════ -->
-        <!-- Column 0: Projects + recipes list             -->
-        <!-- ══════════════════════════════════════════════ -->
-        <Grid Grid.Column="0">
+        <listView:SfListView x:Name="ProjectList"
+                             ItemsSource="{Binding Projects}"
+                             AutoFitMode="DynamicHeight"
+                             SelectionMode="None">
 
-            <listView:SfListView x:Name="ProjectList"
-                                 ItemsSource="{Binding Projects}"
-                                 AutoFitMode="DynamicHeight"
-                                 SelectionMode="None">
+            <listView:SfListView.ItemTemplate>
+                <DataTemplate x:DataType="models:Project">
+                    <SwipeView>
+                        <SwipeView.RightItems>
+                            <SwipeItems Mode="Execute">
+                                <SwipeItem Text="Delete"
+                                           BackgroundColor="#F44336"
+                                           Invoked="OnDeleteSwiped" />
+                            </SwipeItems>
+                        </SwipeView.RightItems>
 
-                <listView:SfListView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Project">
-                        <SwipeView>
-                            <SwipeView.RightItems>
-                                <SwipeItems Mode="Execute">
-                                    <SwipeItem Text="Delete"
-                                               BackgroundColor="#F44336"
-                                               Invoked="OnDeleteSwiped" />
-                                </SwipeItems>
-                            </SwipeView.RightItems>
+                        <Grid RowDefinitions="Auto,Auto" BackgroundColor="White">
 
-                            <Grid RowDefinitions="Auto,Auto" BackgroundColor="White">
+                            <!-- Project header row -->
+                            <Grid Grid.Row="0"
+                                  Padding="16,10"
+                                  RowDefinitions="Auto,Auto"
+                                  ColumnDefinitions="*,Auto,Auto"
+                                  RowSpacing="2">
+                                <Grid.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnHeaderTapped" />
+                                </Grid.GestureRecognizers>
 
-                                <!-- Project header row -->
-                                <Grid Grid.Row="0"
-                                      Padding="16,10"
-                                      RowDefinitions="Auto,Auto"
-                                      ColumnDefinitions="*,Auto,Auto"
-                                      RowSpacing="2">
-                                    <Grid.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnHeaderTapped" />
-                                    </Grid.GestureRecognizers>
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       Text="{Binding Name}"
+                                       FontSize="14"
+                                       FontAttributes="Bold"
+                                       VerticalOptions="Center" />
 
-                                    <Label Grid.Row="0" Grid.Column="0"
-                                           Text="{Binding Name}"
-                                           FontSize="14"
-                                           FontAttributes="Bold"
-                                           VerticalOptions="Center" />
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="{Binding Role, Converter={StaticResource RoleSymbol}}"
+                                       TextColor="{Binding Role, Converter={StaticResource RoleColor}}"
+                                       FontSize="16"
+                                       VerticalOptions="Center"
+                                       Margin="6,0,4,0" />
 
-                                    <Label Grid.Row="0" Grid.Column="1"
-                                           Text="{Binding Role, Converter={StaticResource RoleSymbol}}"
-                                           TextColor="{Binding Role, Converter={StaticResource RoleColor}}"
-                                           FontSize="16"
-                                           VerticalOptions="Center"
-                                           Margin="6,0,4,0" />
-
-                                    <Label Grid.Row="0" Grid.Column="2"
-                                           Text="&#x25BC;"
-                                           FontSize="10"
-                                           TextColor="#9E9E9E"
-                                           VerticalOptions="Center">
-                                        <Label.Triggers>
-                                            <DataTrigger TargetType="Label"
-                                                         Binding="{Binding IsExpanded}"
-                                                         Value="True">
-                                                <Setter Property="Text" Value="&#x25B2;" />
-                                            </DataTrigger>
-                                        </Label.Triggers>
-                                    </Label>
-
-                                    <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
-                                           Text="{Binding Description}"
-                                           FontSize="12"
-                                           TextColor="#757575"
-                                           LineBreakMode="TailTruncation"
-                                           MaxLines="1" />
-                                </Grid>
-
-                                <!-- Expandable recipes -->
-                                <VerticalStackLayout Grid.Row="1"
-                                                     IsVisible="{Binding IsExpanded}"
-                                                     BackgroundColor="#F5F5F5"
-                                                     BindableLayout.ItemsSource="{Binding Recipes}">
-                                    <BindableLayout.ItemTemplate>
-                                        <DataTemplate x:DataType="models:SubstrateRecipe">
-                                            <Grid Padding="24,8,12,8"
-                                                  RowDefinitions="Auto,Auto"
-                                                  RowSpacing="1"
-                                                  BackgroundColor="{Binding IsSelected, Converter={StaticResource SelectedBg}}">
-                                                <Grid.GestureRecognizers>
-                                                    <TapGestureRecognizer Tapped="OnRecipeTapped" />
-                                                </Grid.GestureRecognizers>
-                                                <Label Grid.Row="0"
-                                                       Text="{Binding Name}"
-                                                       FontSize="13"
-                                                       VerticalOptions="Center" />
-                                                <Label Grid.Row="1"
-                                                       Text="{Binding Description}"
-                                                       FontSize="11"
-                                                       TextColor="#9E9E9E"
-                                                       LineBreakMode="TailTruncation"
-                                                       MaxLines="1" />
-                                            </Grid>
-                                        </DataTemplate>
-                                    </BindableLayout.ItemTemplate>
-
-                                    <VerticalStackLayout.Triggers>
-                                        <DataTrigger TargetType="VerticalStackLayout"
-                                                     Binding="{Binding Recipes.Count}"
-                                                     Value="0">
-                                            <Setter Property="IsVisible" Value="False" />
+                                <Label Grid.Row="0" Grid.Column="2"
+                                       Text="&#x25BC;"
+                                       FontSize="10"
+                                       TextColor="#9E9E9E"
+                                       VerticalOptions="Center">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding IsExpanded}"
+                                                     Value="True">
+                                            <Setter Property="Text" Value="&#x25B2;" />
                                         </DataTrigger>
-                                    </VerticalStackLayout.Triggers>
-                                </VerticalStackLayout>
+                                    </Label.Triggers>
+                                </Label>
 
+                                <Label Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="3"
+                                       Text="{Binding Description}"
+                                       FontSize="12"
+                                       TextColor="#757575"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="1" />
                             </Grid>
-                        </SwipeView>
-                    </DataTemplate>
-                </listView:SfListView.ItemTemplate>
 
-            </listView:SfListView>
+                            <!-- Expandable recipes -->
+                            <VerticalStackLayout Grid.Row="1"
+                                                 IsVisible="{Binding IsExpanded}"
+                                                 BackgroundColor="#F5F5F5"
+                                                 BindableLayout.ItemsSource="{Binding Recipes}">
+                                <BindableLayout.ItemTemplate>
+                                    <DataTemplate x:DataType="models:SubstrateRecipe">
+                                        <Grid Padding="24,10,12,10"
+                                              RowDefinitions="Auto,Auto"
+                                              RowSpacing="1">
+                                            <Grid.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnRecipeTapped" />
+                                            </Grid.GestureRecognizers>
+                                            <Label Grid.Row="0"
+                                                   Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   VerticalOptions="Center" />
+                                            <Label Grid.Row="1"
+                                                   Text="{Binding Description}"
+                                                   FontSize="11"
+                                                   TextColor="#9E9E9E"
+                                                   LineBreakMode="TailTruncation"
+                                                   MaxLines="1" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </BindableLayout.ItemTemplate>
 
-            <!-- Empty state -->
-            <VerticalStackLayout x:Name="EmptyState" IsVisible="False"
-                                 HorizontalOptions="Center"
-                                 VerticalOptions="Center"
-                                 Spacing="12">
-                <Label Text="No projects yet"
-                       FontSize="16"
-                       TextColor="#9E9E9E"
-                       HorizontalOptions="Center" />
-                <Label Text="Tap + to create your first project"
-                       FontSize="13"
-                       TextColor="#BDBDBD"
-                       HorizontalOptions="Center" />
-            </VerticalStackLayout>
+                                <VerticalStackLayout.Triggers>
+                                    <DataTrigger TargetType="VerticalStackLayout"
+                                                 Binding="{Binding Recipes.Count}"
+                                                 Value="0">
+                                        <Setter Property="IsVisible" Value="False" />
+                                    </DataTrigger>
+                                </VerticalStackLayout.Triggers>
+                            </VerticalStackLayout>
 
-            <!-- Loading overlay -->
-            <ActivityIndicator IsRunning="{Binding IsLoading}"
-                               IsVisible="{Binding IsLoading}"
-                               Color="#2196F3"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center" />
+                        </Grid>
+                    </SwipeView>
+                </DataTemplate>
+            </listView:SfListView.ItemTemplate>
 
-            <!-- FAB -->
-            <buttons:SfButton Text="+"
-                              BackgroundColor="#2196F3"
-                              TextColor="White"
-                              FontSize="26"
-                              CornerRadius="28"
-                              HeightRequest="52"
-                              WidthRequest="52"
-                              HorizontalOptions="End"
-                              VerticalOptions="End"
-                              Margin="0,0,16,24"
-                              Clicked="OnAddClicked" />
-        </Grid>
+        </listView:SfListView>
 
-        <!-- ══════════════════════════════════════════════ -->
-        <!-- Column 1: Ingredients detail panel            -->
-        <!-- ══════════════════════════════════════════════ -->
-        <Grid Grid.Column="1" BackgroundColor="#FAFAFA">
-
-            <!-- No selection placeholder -->
-            <Label Text="Select a recipe to view its ingredients"
-                   FontSize="14"
+        <!-- Empty state -->
+        <VerticalStackLayout x:Name="EmptyState" IsVisible="False"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"
+                             Spacing="12">
+            <Label Text="No projects yet"
+                   FontSize="16"
+                   TextColor="#9E9E9E"
+                   HorizontalOptions="Center" />
+            <Label Text="Tap + to create your first project"
+                   FontSize="13"
                    TextColor="#BDBDBD"
-                   HorizontalOptions="Center"
-                   VerticalOptions="Center">
-                <Label.Triggers>
-                    <DataTrigger TargetType="Label"
-                                 Binding="{Binding HasSelectedRecipe}"
-                                 Value="True">
-                        <Setter Property="IsVisible" Value="False" />
-                    </DataTrigger>
-                </Label.Triggers>
-            </Label>
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
 
-            <!-- Recipe detail -->
-            <ScrollView IsVisible="{Binding HasSelectedRecipe}">
-                <VerticalStackLayout Padding="16" Spacing="12">
+        <!-- Loading overlay -->
+        <ActivityIndicator IsRunning="{Binding IsLoading}"
+                           IsVisible="{Binding IsLoading}"
+                           Color="#2196F3"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
 
-                    <Label Text="{Binding SelectedRecipe.Name}"
-                           FontSize="16"
-                           FontAttributes="Bold"
-                           TextColor="#212121" />
+        <!-- FAB -->
+        <buttons:SfButton Text="+"
+                          BackgroundColor="#2196F3"
+                          TextColor="White"
+                          FontSize="26"
+                          CornerRadius="28"
+                          HeightRequest="52"
+                          WidthRequest="52"
+                          HorizontalOptions="End"
+                          VerticalOptions="End"
+                          Margin="0,0,16,24"
+                          Clicked="OnAddClicked" />
 
-                    <Label Text="{Binding SelectedRecipe.Description}"
-                           FontSize="13"
-                           TextColor="#757575" />
-
-                    <BoxView HeightRequest="1" Color="#E0E0E0" />
-
-                    <Label Text="Ingredients"
-                           FontSize="13"
-                           FontAttributes="Bold"
-                           TextColor="#424242" />
-
-                    <VerticalStackLayout Spacing="0"
-                                         BindableLayout.ItemsSource="{Binding SelectedRecipe.Ingredients}">
-                        <BindableLayout.ItemTemplate>
-                            <DataTemplate x:DataType="models:RecipeIngredient">
-                                <Grid Padding="0,8"
-                                      ColumnDefinitions="*,Auto,Auto"
-                                      ColumnSpacing="8">
-                                    <Label Grid.Column="0"
-                                           Text="{Binding DisplayName}"
-                                           FontSize="13"
-                                           VerticalOptions="Center" />
-                                    <Label Grid.Column="1"
-                                           Text="{Binding WetAmount, StringFormat='{0:F1} kg'}"
-                                           FontSize="13"
-                                           TextColor="#424242"
-                                           VerticalOptions="Center" />
-                                    <Label Grid.Column="2"
-                                           Text="{Binding WetAmountPercent, StringFormat='{0:F1}%'}"
-                                           FontSize="12"
-                                           TextColor="#9E9E9E"
-                                           VerticalOptions="Center"
-                                           MinimumWidthRequest="44" />
-                                </Grid>
-                            </DataTemplate>
-                        </BindableLayout.ItemTemplate>
-                    </VerticalStackLayout>
-
-                </VerticalStackLayout>
-            </ScrollView>
-
-        </Grid>
-
-        <!-- Dialog overlay (spans both columns) -->
+        <!-- New project dialog overlay -->
         <Grid x:Name="DialogOverlay"
-              Grid.ColumnSpan="2"
               IsVisible="False"
               BackgroundColor="#80000000">
             <Border StrokeShape="RoundRectangle 16"

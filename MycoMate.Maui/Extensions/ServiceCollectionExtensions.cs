@@ -28,6 +28,25 @@ internal static class ServiceCollectionExtensions
         });
 #endif
 
+        void ConfigureClient(IHttpClientBuilder builder)
+        {
+#if DEBUG
+            builder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+            });
+#endif
+            builder.AddHttpMessageHandler<AuthHeaderHandler>();
+            builder.AddStandardResilienceHandler(options =>
+            {
+                options.Retry.MaxRetryAttempts = 3;
+                options.Retry.Delay = TimeSpan.FromSeconds(1);
+                options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
+                options.CircuitBreaker.FailureRatio = 0.5;
+                options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
+            });
+        }
+
         var clientBuilder = services
             .AddRefitClient<IMycoMateApiv1>()
             .ConfigureHttpClient(c =>
@@ -35,24 +54,7 @@ internal static class ServiceCollectionExtensions
                 c.BaseAddress = new Uri(baseAddress);
                 c.Timeout = TimeSpan.FromSeconds(30);
             });
-
-#if DEBUG
-        clientBuilder.ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
-        {
-            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
-        });
-#endif
-
-        clientBuilder.AddHttpMessageHandler<AuthHeaderHandler>();
-
-        clientBuilder.AddStandardResilienceHandler(options =>
-        {
-            options.Retry.MaxRetryAttempts = 3;
-            options.Retry.Delay = TimeSpan.FromSeconds(1);
-            options.CircuitBreaker.SamplingDuration = TimeSpan.FromSeconds(30);
-            options.CircuitBreaker.FailureRatio = 0.5;
-            options.TotalRequestTimeout.Timeout = TimeSpan.FromSeconds(60);
-        });
+        ConfigureClient(clientBuilder);
 
         services.AddSingleton<TokenStore>();
         services.AddTransient<AuthHeaderHandler>();

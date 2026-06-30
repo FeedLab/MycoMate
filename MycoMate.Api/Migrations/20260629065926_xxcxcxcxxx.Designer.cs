@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using MycoMate.Api.Data;
 
@@ -11,9 +12,11 @@ using MycoMate.Api.Data;
 namespace MycoMate.Api.Migrations
 {
     [DbContext(typeof(MycoMateDbContext))]
-    partial class MycoMateDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260629065926_xxcxcxcxxx")]
+    partial class xxcxcxcxxx
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -220,52 +223,11 @@ namespace MycoMate.Api.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("MycoMate.Api.Models.AminoAcid", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShortName")
-                        .IsUnique();
-
-                    b.ToTable("AminoAcids");
-                });
-
             modelBuilder.Entity("MycoMate.Api.Models.Ingredient", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal?>("BulkDensityKgPerM3")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
-
-                    b.Property<decimal?>("CarbonToNitrogenRatio")
-                        .HasPrecision(7, 2)
-                        .HasColumnType("decimal(7,2)");
 
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime2");
@@ -274,10 +236,6 @@ namespace MycoMate.Api.Migrations
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
-
-                    b.Property<string>("Function")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<string>("Information")
                         .HasMaxLength(1000)
@@ -289,10 +247,6 @@ namespace MycoMate.Api.Migrations
                     b.Property<decimal>("MoistureContent")
                         .HasPrecision(5, 2)
                         .HasColumnType("decimal(5,2)");
-
-                    b.Property<decimal?>("PhLevel")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
 
                     b.Property<string>("ShortName")
                         .IsRequired()
@@ -307,96 +261,6 @@ namespace MycoMate.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Ingredients");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientAminoAcid", b =>
-                {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("AminoAcidId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Value")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
-                    b.HasKey("IngredientId", "AminoAcidId");
-
-                    b.HasIndex("AminoAcidId");
-
-                    b.ToTable("IngredientAminoAcids");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientMineral", b =>
-                {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("MineralId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Value")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
-                    b.HasKey("IngredientId", "MineralId");
-
-                    b.HasIndex("MineralId");
-
-                    b.ToTable("IngredientMinerals");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientVitamin", b =>
-                {
-                    b.Property<Guid>("IngredientId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("VitaminId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<decimal>("Value")
-                        .HasPrecision(10, 4)
-                        .HasColumnType("decimal(10,4)");
-
-                    b.HasKey("IngredientId", "VitaminId");
-
-                    b.HasIndex("VitaminId");
-
-                    b.ToTable("IngredientVitamins");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.Mineral", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShortName")
-                        .IsUnique();
-
-                    b.ToTable("Minerals");
                 });
 
             modelBuilder.Entity("MycoMate.Api.Models.Project", b =>
@@ -512,39 +376,6 @@ namespace MycoMate.Api.Migrations
                     b.ToTable("SubstrateRecipes");
                 });
 
-            modelBuilder.Entity("MycoMate.Api.Models.Vitamin", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<string>("Description")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ShortName")
-                        .IsRequired()
-                        .HasMaxLength(10)
-                        .HasColumnType("nvarchar(10)");
-
-                    b.Property<string>("Unit")
-                        .IsRequired()
-                        .HasMaxLength(30)
-                        .HasColumnType("nvarchar(30)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ShortName")
-                        .IsUnique();
-
-                    b.ToTable("Vitamins");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -594,63 +425,6 @@ namespace MycoMate.Api.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientAminoAcid", b =>
-                {
-                    b.HasOne("MycoMate.Api.Models.AminoAcid", "AminoAcid")
-                        .WithMany()
-                        .HasForeignKey("AminoAcidId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("MycoMate.Api.Models.Ingredient", "Ingredient")
-                        .WithMany("AminoAcids")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AminoAcid");
-
-                    b.Navigation("Ingredient");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientMineral", b =>
-                {
-                    b.HasOne("MycoMate.Api.Models.Ingredient", "Ingredient")
-                        .WithMany("Minerals")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MycoMate.Api.Models.Mineral", "Mineral")
-                        .WithMany()
-                        .HasForeignKey("MineralId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Mineral");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.IngredientVitamin", b =>
-                {
-                    b.HasOne("MycoMate.Api.Models.Ingredient", "Ingredient")
-                        .WithMany("Vitamins")
-                        .HasForeignKey("IngredientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("MycoMate.Api.Models.Vitamin", "Vitamin")
-                        .WithMany()
-                        .HasForeignKey("VitaminId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.Navigation("Ingredient");
-
-                    b.Navigation("Vitamin");
                 });
 
             modelBuilder.Entity("MycoMate.Api.Models.Project", b =>
@@ -711,15 +485,6 @@ namespace MycoMate.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Project");
-                });
-
-            modelBuilder.Entity("MycoMate.Api.Models.Ingredient", b =>
-                {
-                    b.Navigation("AminoAcids");
-
-                    b.Navigation("Minerals");
-
-                    b.Navigation("Vitamins");
                 });
 
             modelBuilder.Entity("MycoMate.Api.Models.Project", b =>

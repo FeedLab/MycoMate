@@ -42,6 +42,9 @@ public static class ServiceExtensions
             .AddPolicy(Policies.CanCreateProject, p => p.RequireRole(Roles.Owner));
 
         services.AddScoped<IIngredientRepository, IngredientRepository>();
+        services.AddScoped<IMineralRepository, MineralRepository>();
+        services.AddScoped<IVitaminRepository, VitaminRepository>();
+        services.AddScoped<IAminoAcidRepository, AminoAcidRepository>();
         services.AddScoped<IProjectRepository, ProjectRepository>();
         services.AddScoped<ISubstrateRecipeRepository, SubstrateRecipeRepository>();
         services.AddScoped<TokenService>();

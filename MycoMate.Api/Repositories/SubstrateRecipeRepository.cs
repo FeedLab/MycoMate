@@ -54,11 +54,11 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
         return rows > 0;
     }
 
-    public async Task<bool> AddOrUpdateIngredientAsync(Guid recipeId, Guid ingredientId, decimal amount, CancellationToken ct = default)
+    public async Task<bool> AddOrUpdateIngredientAsync(Guid recipeId, Guid ingredientId, decimal dryPercent, CancellationToken ct = default)
     {
-        var recipeExists = await db.SubstrateRecipes.AnyAsync(r => r.Id == recipeId, ct);
+        var recipe = await db.SubstrateRecipes.FindAsync([recipeId], ct);
 
-        if (!recipeExists)
+        if (recipe is null)
         {
             return false;
         }
@@ -75,7 +75,7 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
 
         if (existing is not null)
         {
-            existing.WetAmount = amount;
+            existing.DryPercent      = dryPercent;
             existing.MoistureContent = ingredient.MoistureContent;
         }
         else
@@ -84,14 +84,14 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
             {
                 RecipeId        = recipeId,
                 IngredientId    = ingredientId,
-                WetAmount       = amount,
+                DryPercent      = dryPercent,
                 MoistureContent = ingredient.MoistureContent
             });
         }
 
         await db.SaveChangesAsync(ct);
 
-        await RecalculateWetAmountPercentsAsync(recipeId, ct);
+        await RecalculateWaterAdjustmentAsync(recipe, ct);
 
         return true;
     }
@@ -104,55 +104,47 @@ public class SubstrateRecipeRepository(MycoMateDbContext db) : ISubstrateRecipeR
 
         if (rows > 0)
         {
-            await RecalculateWetAmountPercentsAsync(recipeId, ct);
+            var recipe = await db.SubstrateRecipes.FindAsync([recipeId], ct);
+
+            if (recipe is not null)
+            {
+                await RecalculateWaterAdjustmentAsync(recipe, ct);
+            }
         }
 
         return rows > 0;
     }
 
-    private async Task RecalculateWetAmountPercentsAsync(Guid recipeId, CancellationToken ct)
+    private async Task RecalculateWaterAdjustmentAsync(SubstrateRecipe recipe, CancellationToken ct)
     {
-        var recipe = await db.SubstrateRecipes.FindAsync([recipeId], ct);
-
-        if (recipe is null)
+        if (recipe.FinalMixtureSizeKg == 0)
         {
             return;
         }
 
-        var all = await db.RecipeIngredients
-            .Where(ri => ri.RecipeId == recipeId)
+        var ingredients = await db.RecipeIngredients
+            .Where(ri => ri.RecipeId == recipe.Id)
             .ToListAsync(ct);
 
-        var totalWet = all.Sum(ri => ri.WetAmount);
+        var totalDryKg = recipe.FinalMixtureSizeKg * (1m - recipe.MoistureContentTarget / 100m);
 
-        if (totalWet == 0)
+        var waterFromIngredients = ingredients.Sum(ri =>
         {
-            return;
-        }
-
-        foreach (var ri in all)
-        {
-            ri.WetAmountPercent = Math.Round(ri.WetAmount / totalWet * 100m, 4);
-            ri.WetMatter        = Math.Round(recipe.FinalMixtureSizeKg * (ri.WetAmountPercent / 100m), 3);
-            ri.DryMatter        = Math.Round(ri.WetMatter * (1m - ri.MoistureContent / 100m), 3);
-        }
-
-        var totalDry = all.Sum(ri => ri.DryMatter);
-
-        if (totalDry > 0)
-        {
-            foreach (var ri in all)
+            if (ri.MoistureContent >= 100m || ri.DryPercent == 0m)
             {
-                ri.DryAmountPercent = Math.Round(ri.DryMatter / totalDry * 100m, 4);
+                return 0m;
             }
-        }
 
-        var currentWaterKg = recipe.FinalMixtureSizeKg - totalDry;
-        var targetWaterKg  = recipe.FinalMixtureSizeKg * (recipe.MoistureContentTarget / 100m);
+            var dryKg = totalDryKg * (ri.DryPercent / 100m);
+            var wetKg = dryKg / (1m - ri.MoistureContent / 100m);
 
-        recipe.WaterAdjustmentPercent = recipe.FinalMixtureSizeKg > 0
-            ? Math.Round((targetWaterKg - currentWaterKg) / recipe.FinalMixtureSizeKg * 100m, 4)
-            : 0m;
+            return wetKg - dryKg;
+        });
+
+        var targetWaterKg = recipe.FinalMixtureSizeKg * (recipe.MoistureContentTarget / 100m);
+
+        recipe.WaterAdjustmentPercent = Math.Round(
+            (targetWaterKg - waterFromIngredients) / recipe.FinalMixtureSizeKg * 100m, 4);
 
         await db.SaveChangesAsync(ct);
     }

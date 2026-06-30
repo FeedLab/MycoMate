@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using MycoMate.Maui.Messages;
 using MycoMate.Maui.Models;
 using MycoMate.Maui.Services.Auth;
+using MycoMate.Maui.Services.Ingredients;
 using MycoMate.Maui.Services.Projects;
 using MycoMate.Maui.Services.SubstrateRecipes;
 
@@ -26,13 +27,16 @@ public partial class ProjectsViewModel : ObservableObject
 
     private readonly ProjectService projectService;
     private readonly SubstrateRecipeService recipeService;
+    private readonly IngredientService ingredientService;
     private readonly TokenStore tokenStore;
     private readonly ILogger<ProjectsViewModel> logger;
 
-    public ProjectsViewModel(ProjectService projectService, SubstrateRecipeService recipeService, TokenStore tokenStore, ILogger<ProjectsViewModel> logger)
+    public ProjectsViewModel(ProjectService projectService, SubstrateRecipeService recipeService,
+        IngredientService ingredientService, TokenStore tokenStore, ILogger<ProjectsViewModel> logger)
     {
         this.projectService = projectService;
         this.recipeService = recipeService;
+        this.ingredientService = ingredientService;
         this.tokenStore = tokenStore;
         this.logger = logger;
 
@@ -63,8 +67,8 @@ public partial class ProjectsViewModel : ObservableObject
                         };
 
                         var recipes = await recipeService.GetAllAsync(project.Id);
-                        foreach (var r in recipes)
-                            project.Recipes.Add(r);
+                        foreach (var recipe in recipes)
+                            project.Recipes.Add(recipe);
 
                         Projects.Add(project);
                     }
@@ -157,6 +161,63 @@ public partial class ProjectsViewModel : ObservableObject
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to load recipes for project {Id}", project.Id);
+        }
+    }
+
+    public async Task<IReadOnlyList<Ingredient>> GetAvailableIngredientsAsync()
+    {
+        if (SelectedRecipe is null) return [];
+        try
+        {
+            return await ingredientService.GetAllAsync(SelectedRecipe.ProjectId);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to load ingredients for project {Id}", SelectedRecipe.ProjectId);
+            return [];
+        }
+    }
+
+    public async Task SetIngredientAsync(Guid ingredientId, decimal dryPercent)
+    {
+        if (SelectedRecipe is null) return;
+        try
+        {
+            var updated = await recipeService.SetIngredientAsync(
+                SelectedRecipe.ProjectId, SelectedRecipe.Id, ingredientId, dryPercent,
+                SelectedRecipe.FinalMixtureSizeKg, SelectedRecipe.MoistureContentTarget);
+
+            SelectedRecipe.Ingredients.Clear();
+            foreach (var i in updated)
+                SelectedRecipe.Ingredients.Add(i);
+
+            logger.LogInformation("Set ingredient {IngredientId} on recipe {RecipeId}", ingredientId, SelectedRecipe.Id);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to set ingredient {IngredientId}", ingredientId);
+            throw;
+        }
+    }
+
+    public async Task RemoveIngredientAsync(Guid ingredientId)
+    {
+        if (SelectedRecipe is null) return;
+        try
+        {
+            await recipeService.RemoveIngredientAsync(
+                SelectedRecipe.ProjectId, SelectedRecipe.Id, ingredientId);
+
+            var toRemove = SelectedRecipe.Ingredients.FirstOrDefault(i => i.IngredientId == ingredientId);
+            if (toRemove is not null)
+                SelectedRecipe.Ingredients.Remove(toRemove);
+
+            logger.LogInformation("Removed ingredient {IngredientId} from recipe {RecipeId}", ingredientId, SelectedRecipe.Id);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Failed to remove ingredient {IngredientId}", ingredientId);
+            throw;
         }
     }
 }

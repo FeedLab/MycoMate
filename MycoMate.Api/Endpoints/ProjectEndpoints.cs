@@ -22,7 +22,8 @@ public static class ProjectEndpoints
 
                 return TypedResults.Ok(response);
             })
-            .WithName("GetProjects");
+            .WithName("GetProjects")
+            .Produces<IEnumerable<ProjectResponse>>();
 
         group.MapGet("/{id:guid}", async (Guid id, ClaimsPrincipal user, IProjectRepository repo,
                 CancellationToken ct) =>
@@ -39,7 +40,8 @@ public static class ProjectEndpoints
 
                 return TypedResults.Ok(new ProjectResponse(project!.Id, project.Name, project.Description, project.Created, project.OwnerId));
             })
-            .WithName("GetProject");
+            .WithName("GetProject")
+            .Produces<ProjectResponse>();
 
         group.MapPost("/", async (CreateProjectRequest req, ClaimsPrincipal user, IProjectRepository repo,
                 CancellationToken ct) =>
@@ -54,7 +56,8 @@ public static class ProjectEndpoints
 
                 return Results.Created($"/projects/{project.Id}", response);
             })
-            .WithName("CreateProject");
+            .WithName("CreateProject")
+            .Produces<ProjectResponse>(StatusCodes.Status201Created);
 
         group.MapPost("/{projectId:guid}/members", async (Guid projectId, AddMemberRequest req,
                 ClaimsPrincipal user, IProjectRepository repo, CancellationToken ct) =>

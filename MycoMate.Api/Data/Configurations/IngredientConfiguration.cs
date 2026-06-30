@@ -10,7 +10,9 @@ public class IngredientConfiguration : IEntityTypeConfiguration<Ingredient>
     {
         builder.HasKey(i => i.Id);
 
-        builder.Property(i => i.MoistureContent)
-            .HasPrecision(5, 2);
+        builder.Property(i => i.MoistureContent).HasPrecision(5, 2);
+        builder.Property(i => i.CarbonToNitrogenRatio).HasPrecision(7, 2);
+        builder.Property(i => i.PhLevel).HasPrecision(4, 2);
+        builder.Property(i => i.BulkDensityKgPerM3).HasPrecision(7, 2);
     }
 }

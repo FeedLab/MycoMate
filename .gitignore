@@ -8,3 +8,8 @@ riderModule.iml
 logs/
 *.DotSettings.user
 .claude/
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates

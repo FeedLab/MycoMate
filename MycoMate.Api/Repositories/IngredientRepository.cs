@@ -9,6 +9,9 @@ public class IngredientRepository(MycoMateDbContext db, ILogger<IngredientReposi
     public async Task<IEnumerable<Ingredient>> GetVisibleAsync(string ownerUserId, CancellationToken ct = default)
     {
         return await db.Ingredients
+            .Include(i => i.Minerals).ThenInclude(im => im.Mineral)
+            .Include(i => i.Vitamins).ThenInclude(iv => iv.Vitamin)
+            .Include(i => i.AminoAcids).ThenInclude(ia => ia.AminoAcid)
             .Where(i => i.UserId == "system" || i.UserId == ownerUserId)
             .ToListAsync(ct);
     }
